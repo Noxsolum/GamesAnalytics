@@ -1,13 +1,11 @@
-﻿Build started 06/09/2015 15:38:46.
-     1>Project "C:\Users\Daniel\documents\visual studio 2013\Projects\LearningOpenGl\LearningOpenGl\LearningOpenGl.vcxproj" on node 2 (Build target(s)).
+﻿Build started 17/12/2015 22:21:40.
+     1>Project "C:\Users\Computing\Documents\GitHub\GamesStuff\GamesAnalytics\LearningOpenGl\LearningOpenGl\LearningOpenGl.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt "Basic Triangle.cpp"
-         Basic Triangle.cpp
-       Link:
-         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Daniel\documents\visual studio 2013\Projects\LearningOpenGl\Debug\LearningOpenGl.exe" /INCREMENTAL /NOLOGO glfw3.lib opengl32.lib glew32s.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Daniel\documents\visual studio 2013\Projects\LearningOpenGl\Debug\LearningOpenGl.pdb" /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Daniel\documents\visual studio 2013\Projects\LearningOpenGl\Debug\LearningOpenGl.lib" /MACHINE:X86 "Debug\Basic Triangle.obj"
-         LearningOpenGl.vcxproj -> C:\Users\Daniel\documents\visual studio 2013\Projects\LearningOpenGl\Debug\LearningOpenGl.exe
-     1>Done Building Project "C:\Users\Daniel\documents\visual studio 2013\Projects\LearningOpenGl\LearningOpenGl\LearningOpenGl.vcxproj" (Build target(s)).
+         C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt "Learning Shaders.cpp"
+         Learning Shaders.cpp
+     1>c:\users\computing\documents\github\gamesstuff\gamesanalytics\learningopengl\learningopengl\learning shaders.cpp(238): error C2228: left of '.ReadingData' must have class/struct/union
+     1>Done Building Project "C:\Users\Computing\Documents\GitHub\GamesStuff\GamesAnalytics\LearningOpenGl\LearningOpenGl\LearningOpenGl.vcxproj" (Build target(s)) -- FAILED.
 
-Build succeeded.
+Build FAILED.
 
-Time Elapsed 00:00:00.92
+Time Elapsed 00:00:00.29

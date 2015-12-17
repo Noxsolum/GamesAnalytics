@@ -1,9 +1,10 @@
 // GLEW
 #define GLEW_STATIC
-#include <GL/glew.h>
+#include <Cunt\glew.h>
 // GLFW
-#include <GLFW/glfw3.h>
+#include <Cunt\glfw3.h>
 #include <iostream>
+#include "ReadingData.h"
 
 using namespace std;
 
@@ -68,6 +69,8 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
 
 int main()
 {
+
+	
 	cout << "Start Program\n";
 	
 	// - With the vertex shader, each input variable is know as a "Vertex Attribute" -
@@ -202,7 +205,7 @@ int main()
 	glBindVertexArray(0); // - Unbind the VAO - 
 
 	// - Uncommenting this line will make the wireframe triangle -
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// --- The Game Loop ---
 
@@ -214,7 +217,7 @@ int main()
 
 		// --- Rendering Commands ---
 			// --- Background Color Buffer ---
-			glClearColor(0.2f, 0.3f, 0.5f, 1.0f); // --- Red, Green, Blue, Alpha ---
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // --- Red, Green, Blue, Alpha ---
 			glClear(GL_COLOR_BUFFER_BIT);
 
 			// --- Drawing Our First Triangle ---
@@ -230,6 +233,9 @@ int main()
 	// --- Deletes the VAO ---
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
+	ReadingData data();
+	
+		//data.ReadingData();
 
 	// --- End Main ---
 	glfwTerminate();
