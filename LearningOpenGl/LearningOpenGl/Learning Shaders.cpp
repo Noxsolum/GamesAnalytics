@@ -1,10 +1,18 @@
-// GLEW
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <sstream>
+
 #define GLEW_STATIC
 #include <Cunt\glew.h>
 // GLFW
 #include <Cunt\glfw3.h>
-#include <iostream>
 #include "ReadingData.h"
+#include <Cunt\glm\glm.hpp>
+#include <Cunt\glm\gtc\matrix_transform.hpp>
+#include <Cunt\glm\gtc\type_ptr.hpp>
+#include <Cunt\glm\ext.hpp>
+#include <Cunt\glm\gtx\string_cast.hpp>
 
 using namespace std;
 
@@ -208,12 +216,21 @@ int main()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// --- The Game Loop ---
-
+	glm::vec3 stuff[10];		
+	ReadingData(stuff);
+	for (int i = 0; i < 10; i++)
+	{
+		cout << glm::to_string(stuff);
+	}
 	// - Stops the Windows Closing until the User is finished -
 	while (!glfwWindowShouldClose(window))
 	{
 		// --- Checks if any events have been activated e.g. key press ---
-		glfwPollEvents(); 
+		glfwPollEvents();
+		
+
+
+		
 
 		// --- Rendering Commands ---
 			// --- Background Color Buffer ---
@@ -233,7 +250,6 @@ int main()
 	// --- Deletes the VAO ---
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-	ReadingData data();
 	
 		//data.ReadingData();
 
