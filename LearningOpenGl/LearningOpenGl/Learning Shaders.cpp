@@ -8,11 +8,11 @@
 // GLFW
 #include <Cunt\glfw3.h>
 #include "ReadingData.h"
-#include <Cunt\glm\glm.hpp>
-#include <Cunt\glm\gtc\matrix_transform.hpp>
-#include <Cunt\glm\gtc\type_ptr.hpp>
-#include <Cunt\glm\ext.hpp>
-#include <Cunt\glm\gtx\string_cast.hpp>
+#include <glm\glm.hpp>
+#include <glm\gtc\matrix_transform.hpp>
+#include <glm\gtc\type_ptr.hpp>
+#include <glm\ext.hpp>
+#include <glm\gtx\string_cast.hpp>
 
 using namespace std;
 
@@ -22,56 +22,80 @@ const GLuint WIDTH = 800, HEIGHT = 600;
 // --- Input Function ---
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
-// --- GLSL Shaders ---
-// - THe shaders are, very simply, nothing more than programs that transform inputs to outputs -
-// - We use GLSL for this because it is specifically tailored to vector and matrix manipulation - 
-//
-// -- A Shader always begins with the version declaration --
-// #version version_number
-//
-// -- Followed by the Inputs, Outputs and Uniforms --
-// in type in_varible_name;
-// in type in_varible_name;
-//
-// out type out_varible_name;
-// out type out_varible_name;
-//
-// uniform type uniform_name;
-//
-// -- Followed by it's main function where we process all of the input varibles and output them in the output varibles --
-// int main()
-// {
-// // Process the inputs and do weird graphics stuff
-// ...
-// //Output the processed stuff to output variable
-// output_variable_name = weird_stuff_we_processed;
-// }
+/* --- GLSL Shaders ---
+ - THe shaders are, very simply, nothing more than programs that transform inputs to outputs -
+ - We use GLSL for this because it is specifically tailored to vector and matrix manipulation - 
 
-// --- Types ---
-// - GLSL has all the basic types we know (int, float, double, uint, bool) -
-// - It also introduces two container types which are vectors and matrices -
+ -- A Shader always begins with the version declaration --
+ #version version_number
 
-// --- Vectors ---
+ -- Followed by the Inputs, Outputs and Uniforms --
+ in type in_varible_name;
+ in type in_varible_name;
 
+ out type out_varible_name;
+ out type out_varible_name;
 
+ uniform type uniform_name;
+
+ -- Followed by it's main function where we process all of the input varibles and output them in the output varibles --
+ void main()
+ {
+ // Process the inputs and do weird graphics stuff
+ ...
+ //Output the processed stuff to output variable
+ output_variable_name = weird_stuff_we_processed;
+ }
+
+ --- Types ---
+ - GLSL has all the basic types we know (int, float, double, uint, bool) -
+ - It also introduces two container types which are vectors and matrices -
+
+ --- Vectors ---
+ - vecn: Default number of n floats
+ - bvecn: a vector of n booleans.
+ - ivecn: a vector of n integers.
+ - uvecn: a vector of n unsigned integers.
+ - dvecn: a vector of n double components.
+
+ - To access the individual componants of these vecs we will use .x, .y, .z and .w
+ - e.g. vec3 someVec; 
+ - e.g. someVec.x;
+ - e.g. someVec = (1.0f, 1.0f, 1.0f)
+ - e.g. vec4 otherVec = (someVec.xyz, 1.0f)
+
+ - GLSL uses the keyword 'in' and 'out' to move things about within the shaders
+ */
 // --- Vertex Shader ---
 // - The vertex shade uses the co-ordinates from one 3D vertex and turns them into different 3D co-ordinates -
 const GLchar* vertexShaderSource = "#version 330 core\n"
 
 "layout (location = 0) in vec3 position;\n"
 
+"out vec4 vertexColor;\n" // Specify a color output to the fragment shader
+
 "void main()\n"
 "{\n"
-"gl_Position = vec4(position.x, position.y, position.z, 1.0);\n"
+
+"gl_Position = vec4(position, 1.0);\n"
+"vertexColor = vec4(0.5f, 0.0f, 0.0f, 1.0f);\n"
+
 "}\n";
 
 // --- Fragment Shader ---
 // - The fragement shader is basically the thing that calulates the final colour of a pixal, it's where the advanced OpenGL Effects occur -
 const GLchar* fragmentShaderSource = "#version 330 core\n"
+// "in vec4 vertexColor;\n" // Recieves the output data from the vertex shader
+
 "out vec4 color;\n"
+
+"uniform vec4 ourColor;\n"
+
 "void main()\n"
 "{\n"
-"color = vec4(1.0f, 0.5f, 0.6f, 1.0f);\n" //Colour of the triangle
+
+"color = ourColor;\n"
+
 "}\n\0";
 
 
@@ -213,24 +237,15 @@ int main()
 	glBindVertexArray(0); // - Unbind the VAO - 
 
 	// - Uncommenting this line will make the wireframe triangle -
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	// --- The Game Loop ---
-	glm::vec3 stuff[10];		
-	ReadingData(stuff);
-	for (int i = 0; i < 10; i++)
-	{
-		cout << glm::to_string(stuff);
-	}
+	// --- The Game Loop ---		
+
 	// - Stops the Windows Closing until the User is finished -
 	while (!glfwWindowShouldClose(window))
 	{
 		// --- Checks if any events have been activated e.g. key press ---
 		glfwPollEvents();
-		
-
-
-		
 
 		// --- Rendering Commands ---
 			// --- Background Color Buffer ---
@@ -239,6 +254,15 @@ int main()
 
 			// --- Drawing Our First Triangle ---
 			glUseProgram(shaderProgram);
+
+			// --- Lets us change colour over time ---
+			GLfloat timeValue = glfwGetTime(); // Run time in seconds
+			GLfloat greenValue = ((sin(timeValue)/4) + 0.5); // Vary the colour based on sin/cos
+			GLfloat redValue = ((cos(timeValue)/2) + 0.5); // Vary the colour based on sin/cos
+			GLfloat blueValue = ((cos(timeValue)/2) + 0.5); // Vary the colour based on sin/cos
+			GLint vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor"); // gets the uniforms location
+			glUniform4f(vertexColorLocation, redValue, greenValue, blueValue, 1.0f); // Lastly we set the uniform value using this
+
 			glBindVertexArray(VAO); // Binds the VAO
 			glDrawArrays(GL_TRIANGLES, 0, 3); // Draws the Triangle (Type of drawing, Unknown, number of vertices)
 			glBindVertexArray(0); // Unbinds the VAO

@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Learning Shaders.cpp">
+    <ClCompile Include="ReadingData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ReadingData.cpp">
+    <ClCompile Include="Actual thing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
