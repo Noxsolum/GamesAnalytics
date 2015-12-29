@@ -3,8 +3,10 @@
 #include <string>
 #include <sstream>
 
+// GLEW
 #define GLEW_STATIC
 #include <Cunt\glew.h>
+
 // GLFW
 #include <Cunt\glfw3.h>
 #include "ReadingData.h"
@@ -16,11 +18,32 @@
 
 using namespace std;
 
-// --- Window Dimensions 
+// --- Window Dimensions ---
 const GLuint WIDTH = 800, HEIGHT = 600;
 
 // --- Input Function ---
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
+void do_movement();
+
+// --- Camera ---
+glm::vec3 cameraPos = glm::vec3(325.0f, 754.0f, 2526.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+glm::vec3 cameraRight = glm::vec3(1.0f, 0.0f, 0.0f);
+bool keys[1024];
+
+// --- Deltatimte ---
+GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
+GLfloat lastFrame = 0.0f;  	// Time of last frame
+
+// --- HeatMap ---
+void CheckWithin(GLuint Ref, glm::vec3 Square[], glm::vec3 PlayerPos[]);
+void CreateSquareArray(glm::vec3 SquareList[]);
+void colourpicker(int noOfInts);
+
+GLfloat colorBlue = 0.0f;
+GLfloat colorRed = 0.0f;
+GLfloat colorGreen = 0.0f;
 
 /* --- GLSL Shaders ---
 - THe shaders are, very simply, nothing more than programs that transform inputs to outputs -
@@ -68,17 +91,27 @@ output_variable_name = weird_stuff_we_processed;
 */
 // --- Vertex Shader ---
 // - The vertex shade uses the co-ordinates from one 3D vertex and turns them into different 3D co-ordinates -
+
 const GLchar* vertexShaderSource = "#version 330 core\n"
 
 "layout (location = 0) in vec3 position;\n"
+"layout(location = 1) in vec2 texCoord;\n"
 
 "out vec4 vertexColor;\n" // Specify a color output to the fragment shader
+"out vec2 TexCoord;\n"
+
+"uniform mat4 transform;\n"
+"uniform mat4 model;\n"
+"uniform mat4 view;\n"
+"uniform mat4 projection;\n"
 
 "void main()\n"
 "{\n"
 
-"gl_Position = vec4(position, 1.0);\n"
+//"gl_Position = projection * view * vec4(position, 1.0f);\n" // Default
+"gl_Position = projection * view * transform * vec4(position, 1.0f);\n" // With Translations
 "vertexColor = vec4(0.5f, 0.0f, 0.0f, 1.0f);\n"
+"TexCoord = vec2(texCoord.x, 1.0 - texCoord.y);\n"
 
 "}\n";
 
@@ -101,9 +134,10 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
 
 int main()
 {
-
-
 	cout << "Start Program\n";
+	fileOpen();
+	glm::vec3 HeatMapSquares[34400];
+	CreateSquareArray(HeatMapSquares);
 
 	// - With the vertex shader, each input variable is know as a "Vertex Attribute" -
 	// - We are limited by the hardware to how many of these we can declare by we are guaranted at least 16 4-Component Vertex Attributes -
@@ -208,10 +242,43 @@ int main()
 
 	// --- VERTEX INPUT ---
 	GLfloat vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f,
+		-5.0f, -5.0f, 0.0f,
+		5.0f, -5.f, 0.0f,
+		5.0f, 5.0f, 0.0f,
+
+		-5.0f, -5.0f, 0.0f,
+		-5.0f, 5.0f, 0.0f,
+		5.0f, 5.0f, 0.0f
 	};
+
+	// --- Actual Positions ---
+
+	const int ArraySize = 30000;
+	glm::vec3 player0Positions[ArraySize];
+	ReadingPlayer0(player0Positions);
+
+	//glm::vec3 player1Positions[ArraySize];
+	//ReadingPlayer1(player1Positions);
+
+	//for (int i = 0; i < 50000; i++)
+	//{
+	//	cout << glm::to_string(playerPositions[i]) << endl;
+	//}
+
+	// --- Testing the Positions ---
+
+	//glm::vec3 cubePositions[] = {
+	//	glm::vec3(0.0f,  0.0f,  0.0f),
+	//	glm::vec3(2.0f,  5.0f, 0.0f),
+	//	glm::vec3(-1.5f, -2.2f, 0.0f),
+	//	glm::vec3(-3.8f, -2.0f, 0.0f),
+	//	glm::vec3(2.4f, -0.4f, 0.0f),
+	//	glm::vec3(-1.7f,  3.0f, 0.0f),
+	//	glm::vec3(1.3f, -2.0f, 0.0f),
+	//	glm::vec3(1.5f,  2.0f, 0.0f),
+	//	glm::vec3(1.5f,  0.2f, 0.0f),
+	//	glm::vec3(-1.3f,  1.0f, 0.0f)
+	//};
 
 	// --- Buffer Objects ---
 	GLuint VBO, VAO;
@@ -239,13 +306,19 @@ int main()
 						  // - Uncommenting this line will make the wireframe triangle -
 						  //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-						  // --- The Game Loop ---		
+	// --- The Game Loop ---		
 
-						  // - Stops the Windows Closing until the User is finished -
+	// - Stops the Windows Closing until the User is finished -
 	while (!glfwWindowShouldClose(window))
 	{
+		// --- Calculate deltatime of the current frame ---
+		GLfloat currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
 		// --- Checks if any events have been activated e.g. key press ---
 		glfwPollEvents();
+		do_movement();
 
 		// --- Rendering Commands ---
 		// --- Background Color Buffer ---
@@ -255,19 +328,117 @@ int main()
 		// --- Drawing Our First Triangle ---
 		glUseProgram(shaderProgram);
 
-		// --- Lets us change colour over time ---
-		GLfloat timeValue = glfwGetTime(); // Run time in seconds
-		GLfloat greenValue = ((sin(timeValue) / 4) + 0.5); // Vary the colour based on sin/cos
-		GLfloat redValue = ((cos(timeValue) / 2) + 0.5); // Vary the colour based on sin/cos
-		GLfloat blueValue = ((cos(timeValue) / 2) + 0.5); // Vary the colour based on sin/cos
+		// --- Camera ---
+		glm::mat4 view;
+
+		/*
+		//glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+		//glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+		//glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+		//glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+		//glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+		//glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+		// - Auto Rotate -
+		GLfloat radius = 10.0f;
+		//GLfloat camX = sin(glfwGetTime()) * radius;
+		//GLfloat camZ = cos(glfwGetTime()) * radius;
+		//view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+		*/
+
+		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+		cout << glm::to_string(cameraPos) << endl;
+
+		// --- View and projection ---
+		//glm::mat4 view;
+		glm::mat4 projection;
+		
+		//view = glm::translate(view, glm::vec3(-300.0f, -700.0f, -4000.0f)); // the view we are alligned too
+		projection = glm::perspective(glm::radians(45.0f), (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 5000.0f); // the Max and Min we set to be able to see
+
+		// Get their uniform location
+		GLint viewLoc = glGetUniformLocation(shaderProgram, "view");
+		GLint projLoc = glGetUniformLocation(shaderProgram, "projection");
+
+		// Pass the matrices to the shader
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+		// Note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+		// --- Colours ---
+
+		//GLfloat timeValue = glfwGetTime(); // Run time in seconds
+		//GLfloat greenValue = ((sin(timeValue) / 2) + 0.5); // Vary the colour based on sin/cos
+		//GLfloat redValue = ((sin(timeValue) / 2) + 0.5); // Vary the colour based on sin/cos
+		//GLfloat blueValue = ((sin(timeValue) / 2) + 0.5); // Vary the colour based on sin/cos
+
 		GLint vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor"); // gets the uniforms location
-		glUniform4f(vertexColorLocation, redValue, greenValue, blueValue, 1.0f); // Lastly we set the uniform value using this
 
-		glBindVertexArray(VAO); // Binds the VAO
-		glDrawArrays(GL_TRIANGLES, 0, 3); // Draws the Triangle (Type of drawing, Unknown, number of vertices)
+		//glUniform4f(vertexColorLocation, redValue, greenValue, blueValue, 1.0f); // Lastly we set the uniform value using this
+
+		//CheckWithin();
+		colorRed = 1.0f;
+		colorBlue = 0.0f;
+		colorGreen = 1.0f;
+		glUniform4f(vertexColorLocation, colorRed, colorGreen, colorBlue, 1.0f);
+		// ...
+
+		// --- Spawning the triangles ---
+
+		glBindVertexArray(VAO);
+
+		//for (GLuint i = 0; i < ArraySize; i++)
+		//{
+		//	if (player0Positions[i].x != 0 && player0Positions[i].y != 0)
+		//	{
+		//		glm::mat4 trans;
+		//		trans = glm::translate(trans, player0Positions[i]);
+		//		//trans = glm::translate(trans, cubePositions[i]);
+		//		//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+		//		GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+		//		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+		//		glDrawArrays(GL_TRIANGLES, 0, 3); // Draws the Triangle (Type of drawing, Unknown, number of vertices)
+		//	}
+		//}
+
+		//glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+
+		//for (GLuint i = 0; i < ArraySize; i++)
+		//{
+		//	if (player1Positions[i].x != 0 && player1Positions[i].y != 0)
+		//	{
+		//		glm::mat4 trans;
+		//		trans = glm::translate(trans, player1Positions[i]);
+		//		//trans = glm::translate(trans, cubePositions[i]);
+		//		//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+		//		GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+		//		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+		//		glDrawArrays(GL_TRIANGLES, 0, 3); // Draws the Triangle (Type of drawing, Unknown, number of vertices)
+		//	}
+		//}
+
+		// --- Spawning the Squares ---
+
+		for (GLuint i = 0; i < 34400; i++)
+		{
+			CheckWithin(i, HeatMapSquares, player0Positions);
+			glUniform4f(vertexColorLocation, colorRed, colorGreen, colorBlue, 1.0f);
+			glm::mat4 trans;
+			trans = glm::translate(trans, HeatMapSquares[i]);
+			//trans = glm::translate(trans, cubePositions[i]);
+			//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
+			GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+			glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+			glDrawArrays(GL_TRIANGLES, 0, 6); // Draws the Triangle (Type of drawing, Unknown, number of verticess 
+		}
+
+		// --- Default ---
+
+		//glDrawArrays(GL_TRIANGLES, 0, 6);
+
 		glBindVertexArray(0); // Unbinds the VAO
-
-							  // --- Once the back buffer is done rendering anything to display it is transfered to the front buffer as a complete image hence swap buffers ---
+		
+		// --- Once the back buffer is done rendering anything to display it is transfered to the front buffer as a complete image hence swap buffers ---
 		glfwSwapBuffers(window);
 	}
 
@@ -279,6 +450,7 @@ int main()
 
 	// --- End Main ---
 	glfwTerminate();
+	fileClose();
 	return 0;
 }
 
@@ -288,7 +460,209 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	// When a user presses the escape key, we set the WindowShouldClose property to true, closing the application
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
+	if (key >= 0 && key < 1024)
+	{
+		if (action == GLFW_PRESS)
+			keys[key] = true;
+		else if (action == GLFW_RELEASE)
+			keys[key] = false;
+	}
+}
 
-	if (key == GLFW_KEY_ENTER && action == GLFW_PRESS)
-		cout << "Enter Pressed";
+void do_movement()
+{
+	// Camera controls
+	GLfloat cameraSpeed = 500.0f * deltaTime;
+
+	if (cameraPos.z < 500.0f)
+	{
+		cameraSpeed = 100 * deltaTime;
+	}
+
+	if (keys[GLFW_KEY_PAGE_UP])
+		cameraPos += cameraSpeed * cameraFront;
+	if (keys[GLFW_KEY_PAGE_DOWN])
+		cameraPos -= cameraSpeed * cameraFront;
+	if (keys[GLFW_KEY_W])
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraRight)) * cameraSpeed;
+	if (keys[GLFW_KEY_S])
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraRight)) * cameraSpeed;
+	if (keys[GLFW_KEY_A])
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (keys[GLFW_KEY_D])
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
+void CheckWithin(GLuint Ref, glm::vec3 Square[], glm::vec3 PlayerPos[])
+{
+	int i = 0;
+	for (int j = 0; j < 30000; j++)
+	{
+		if ((PlayerPos[j].x != 0) && (PlayerPos[j].y != 0))
+		{
+			if ((PlayerPos[j].x < (Square[Ref].x + 5)) && (PlayerPos[j].x >(Square[Ref].x - 5)) && (PlayerPos[j].y < (Square[Ref].y + 5)) && (PlayerPos[j].y >(Square[Ref].y - 5)))
+			{
+				i++;
+				cout << i << endl;
+				colourpicker(i);
+			}
+		}
+	}
+	i = 0;
+}
+
+void CreateSquareArray(glm::vec3 SquareList[])
+{
+	//Spawn squares every 10 points along the coords
+	// Max Point: (1230, 1750), Min Point: (-490, -250)
+	// 1750
+	int k = 0;
+
+	int x = 1225;
+	for (int i = 0; i < 171; i++)
+	{
+		x = x - 10;
+		int y = 1745;
+		for (int j = 0; j < 199; j++)
+		{
+			y = y - 10;
+			SquareList[k] = glm::vec3(x, y, 1.0f);
+			k++;
+		}
+	}
+	k = 0;
+}
+
+void colourpicker(int noOfInts)
+{
+	switch (noOfInts) {
+	case 0:
+		colorRed = 0.0f;
+		colorGreen = 0.0f;
+		colorBlue = 0.0f;
+		break;
+	case 1:
+		colorRed = 0.0f;
+		colorGreen = 0.0f;
+		colorBlue = 0.2f;
+		break;
+	case 2:
+		colorRed = 0.0f;
+		colorGreen = 0.0f;
+		colorBlue = 0.4f;
+	case 3:
+		colorRed = 0.0f;
+		colorGreen = 0.0f;
+		colorBlue = 0.6f;
+		break;
+	case 4:
+		colorRed = 0.0f;
+		colorGreen = 0.0f;
+		colorBlue = 0.8f;
+		break;
+	case 5:
+		colorRed = 0.0f;
+		colorGreen = 0.0f;
+		colorBlue = 1.0f;
+		break;
+	case 6:
+		colorRed = 0.0f;
+		colorGreen = 0.2f;
+		colorBlue = 1.0f;
+		break;
+	case 7:
+		colorRed = 0.0f;
+		colorGreen = 0.4f;
+		colorBlue = 1.0f;
+		break;
+	case 8:
+		colorRed = 0.0f;
+		colorGreen = 0.6f;
+		colorBlue = 1.0f;
+		break;
+	case 9:
+		colorRed = 0.0f;
+		colorGreen = 0.8f;
+		colorBlue = 1.0f;
+		break;
+	case 10:
+		colorRed = 0.0f;
+		colorGreen = 1.0f;
+		colorBlue = 1.0f;
+		break;
+	case 11:
+		colorRed = 0.0f;
+		colorGreen = 1.0f;
+		colorBlue = 0.8f;
+		break;
+	case 12:
+		colorRed = 0.0f;
+		colorGreen = 1.0f;
+		colorBlue = 0.6f;
+		break;
+	case 13:
+		colorRed = 0.0f;
+		colorGreen = 1.0f;
+		colorBlue = 0.4f;
+		break;
+	case 14:
+		colorRed = 0.0f;
+		colorGreen = 1.0f;
+		colorBlue = 0.2f;
+		break;
+	case 15:
+		colorRed = 0.0f;
+		colorGreen = 1.0f;
+		colorBlue = 0.0f;
+		break;
+	case 16:
+		colorRed = 0.2f;
+		colorGreen = 1.0f;
+		colorBlue = 0.0f;
+		break;
+	case 17:
+		colorRed = 0.4f;
+		colorGreen = 1.0f;
+		colorBlue = 0.0f;
+		break;
+	case 18:
+		colorRed = 0.6f;
+		colorGreen = 1.0f;
+		colorBlue = 0.0f;
+		break;
+	case 19:
+		colorRed = 0.8f;
+		colorGreen = 1.0f;
+		colorBlue = 0.0f;
+		break;
+	case 20:
+		colorRed = 1.0f;
+		colorGreen = 1.0f;
+		colorBlue = 0.0f;
+		break;
+	case 21:
+		colorRed = 1.0f;
+		colorGreen = 0.8f;
+		colorBlue = 0.0f;
+		break;
+	case 22:
+		colorRed = 1.0f;
+		colorGreen = 0.6f;
+		colorBlue = 0.0f;
+		break;
+	case 23:
+		colorRed = 1.0f;
+		colorGreen = 0.4f;
+		colorBlue = 0.0f;
+		break;
+	case 24:
+		colorRed = 1.0f;
+		colorGreen = 0.2f;
+		colorBlue = 0.0f;
+		break;
+	default:
+		colorRed = 1.0f;
+		colorGreen = 0.0f;
+		colorBlue = 0.0f;
+	}
 }

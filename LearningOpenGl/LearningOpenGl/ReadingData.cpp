@@ -16,12 +16,22 @@
 
 using namespace std;
 
-glm::vec3 ReadingData()
+ifstream myLogFile;
+
+void fileOpen()
+{
+	myLogFile.open("C:\\Users\\Dan\\Desktop\\DataForReading.txt");
+}
+
+void fileClose()
+{
+	myLogFile.close();
+}
+
+void ReadingPlayer0(glm::vec3 newArray[])
 {
 	string line;
-	ifstream myLogFile;
-
-	myLogFile.open("C:\\Users\\Dan\\Desktop\\DataForReading.txt");
+	int MaxNum = 0;
 
 	cout << "Enters Reading Data";
 	int i = 0;
@@ -34,90 +44,130 @@ glm::vec3 ReadingData()
 		{
 			int ClientNum;
 			in >> ClientNum;
-			cout << endl << ClientNum << endl;
 			if (ClientNum == 0)
 			{
 				getline(myLogFile, line);
 				istringstream in(line);
 				string PosLine;
 				in >> PosLine;
-				cout << PosLine << endl;
 				if (PosLine == "CurrentPos")
 				{
-					cout << "Player 0:\n";
-					float x, y, z;
-					in >> x >> y >> z;
-					glm::vec3(boob);
-					cout << "CurrentPos:";
-					boob = glm::vec3(x, y, z);
-					cout << glm::to_string(boob) << endl;
+					float x, y;
+					in >> x >> y;
+					newArray[i] = glm::vec3(x, y, 0.0f);
 					i++;
 				}
-			}
-			else if (ClientNum == 1)
-			{
-				getline(myLogFile, line);
-				istringstream in(line);
-				string PosLine;
-				in >> PosLine;
-				cout << PosLine << endl;
-				if (PosLine == "CurrentPos")
-				{
-					cout << "Player 1:\n";
-					float x, y, z;
-					in >> x >> y >> z;
-					glm::vec3(boob);
-					cout << "CurrentPos:";
-					boob = glm::vec3(x, y, z);
-					cout << glm::to_string(boob) << endl;
-					i++;
-				}
-			}
-			else if (ClientNum == 2)
-			{
-				getline(myLogFile, line);
-				istringstream in(line);
-				string PosLine;
-				in >> PosLine;
-				cout << PosLine << endl;
-				if (PosLine == "CurrentPos")
-				{
-					cout << "Player 2:\n";
-					float x, y, z;
-					in >> x >> y >> z;
-					glm::vec3(boob);
-					cout << "CurrentPos:";
-					boob = glm::vec3(x, y, z);
-					cout << glm::to_string(boob) << endl;
-					i++;
-				}
-			}
-			else if (ClientNum == 3)
-			{
-				getline(myLogFile, line);
-				istringstream in(line);
-				string PosLine;
-				in >> PosLine;
-				cout << PosLine << endl;
-				if (PosLine == "CurrentPos")
-				{
-					cout << "Player 3:\n";
-					float x, y, z;
-					in >> x >> y >> z;
-					glm::vec3(boob);
-					cout << "CurrentPos:";
-					boob = glm::vec3(x, y, z);
-					cout << glm::to_string(boob) << endl;
-					i++;
-				}
-			}
-			else
-			{
-				cout << "No player";
 			}
 		}
-
 	}
 	i = 0;
-	return glm::vec3(0.0f, 0.0f, 0.0f);
+};
+
+void ReadingPlayer1(glm::vec3 newArray[])
+{
+	string line;
+	int MaxNum = 0;
+
+	cout << "Enters Reading Data";
+	int i = 0;
+	for (string line; getline(myLogFile, line);)
+	{
+		istringstream in(line);
+		string type;
+		in >> type;
+		if (type == "Player")
+		{
+			int ClientNum;
+			in >> ClientNum;
+			if (ClientNum == 1)
+			{
+				getline(myLogFile, line);
+				istringstream in(line);
+				string PosLine;
+				in >> PosLine;
+				if (PosLine == "CurrentPos")
+				{
+					float x, y;
+					in >> x >> y;
+					newArray[i] = glm::vec3(x, y, 0.0f);
+					i++;
+				}
+			}
+		}
+	}
+	i = 0;
+};
+
+void ReadingPlayer2(glm::vec3 newArray[])
+{
+	string line;
+	int MaxNum = 0;
+
+	cout << "Enters Reading Data";
+	int i = 0;
+	for (string line; getline(myLogFile, line);)
+	{
+		istringstream in(line);
+		string type;
+		in >> type;
+		{
+			int ClientNum;
+			in >> ClientNum;
+			if (ClientNum == 2)
+			{
+				getline(myLogFile, line);
+				istringstream in(line);
+				string PosLine;
+				in >> PosLine;
+				if (PosLine == "CurrentPos")
+				{
+					float x, y;
+					in >> x >> y;
+					newArray[i] = glm::vec3(x, y, 0.0f);
+					i++;
+				}
+			}
+		}
+	}
+	i = 0;
+};
+
+glm::vec3 ReadingPlayer3()
+{
+
+};
+
+void HeatMapData(glm::vec3 SquaresArray[], glm::vec3 ColorArray[])
+{
+	string line;
+	int MaxNum = 0;
+
+	cout << "Enters Reading Data";
+	int i = 0;
+	for (string line; getline(myLogFile, line);)
+	{
+		istringstream in(line);
+		string type;
+		in >> type;
+		if (type == "Player")
+		{
+			int ClientNum;
+			in >> ClientNum;
+			if (ClientNum == 0)
+			{
+				getline(myLogFile, line);
+				istringstream in(line);
+				string PosLine;
+				in >> PosLine;
+				if (PosLine == "CurrentPos")
+				{
+					float x, y;
+					in >> x >> y;
+					ColorArray[i] = glm::vec3(x, y, 0.0f);
+					i++;
+				}
+			}
+		}
+	}
+	i = 0;
 };

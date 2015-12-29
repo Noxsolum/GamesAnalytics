@@ -11,8 +11,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ReadingData.cpp" />
     <ClCompile Include="Actual thing.cpp" />
+    <ClCompile Include="ReadingData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ReadingData.h" />

@@ -73,30 +73,32 @@ const GLchar* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 position;\n"
 
 "out vec4 vertexColor;\n" // Specify a color output to the fragment shader
+//"out vec3 ourColor;\n"
 
 "void main()\n"
 "{\n"
 
 "gl_Position = vec4(position, 1.0);\n"
 "vertexColor = vec4(0.5f, 0.0f, 0.0f, 1.0f);\n"
+//"ourColor = color;\n"
 
 "}\n";
 
 // --- Fragment Shader ---
 // - The fragement shader is basically the thing that calulates the final colour of a pixal, it's where the advanced OpenGL Effects occur -
 const GLchar* fragmentShaderSource = "#version 330 core\n"
-// "in vec4 vertexColor;\n" // Recieves the output data from the vertex shader
+"in vec4 vertexColor;\n" // Recieves the output data from the vertex shader
+
+//"in vec3 ourColor;\n"
 
 "out vec4 color;\n"
-
-"uniform vec4 ourColor;\n"
 
 "void main()\n"
 "{\n"
 
-"color = ourColor;\n"
+"color = vertexColor;\n"
 
-"}\n\0";
+"}\n";
 
 
 int main()
@@ -208,10 +210,21 @@ int main()
 
 	// --- VERTEX INPUT ---
 	GLfloat vertices[] = {
-		-0.5f, -0.5f, 0.0f,
-		0.5f, -0.5f, 0.0f,
-		0.0f, 0.5f, 0.0f,
+		-0.01f, -0.01f, 0.0f,
+		0.01f, -0.01f, 0.0f,
+		0.0f, 0.01f, 0.0f
 	};
+
+	
+	// --- Player Positions ---
+	const int ArraySize = 50000;
+	glm::vec2 playerPositions[ArraySize];
+	ReadingPlayer0(playerPositions);
+	for (int i = 0; i < 50000; i++)
+	{
+		cout << glm::to_string(playerPositions[i]) << endl;
+	}
+
 
 	// --- Buffer Objects ---
 	GLuint VBO, VAO;
@@ -232,6 +245,9 @@ int main()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0); // - Specifies which vertex attribute we want to configure (Location = 0), Size of the vertex attribute, Type of data, Normalized data or not?, The stride (Explained later), The offset of where the position data begins in the buffer - 
 	glEnableVertexAttribArray(0); // - Enables the vertex attribute since it is disabled by default -
 
+	// - Color Attribute
+	//glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	//glEnableVertexAttribArray(1);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0); // - Unbind the VAO - 
@@ -240,7 +256,7 @@ int main()
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 	// --- The Game Loop ---		
-
+	
 	// - Stops the Windows Closing until the User is finished -
 	while (!glfwWindowShouldClose(window))
 	{
