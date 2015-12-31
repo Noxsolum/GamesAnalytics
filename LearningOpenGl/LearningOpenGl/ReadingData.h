@@ -19,6 +19,5 @@ void fileClose();
 void ReadingPlayer0(glm::vec3 newArray[]);
 void ReadingPlayer1(glm::vec3 newArray[]);
 void ReadingPlayer2(glm::vec3 newArray[]);
-void ReadingPlayer3(glm::vec3 newArray[]);
-
-void HeatMapData(glm::vec3 SquaresArray[], glm::vec3 ColorArray[]);
+void ReadingPlayer3(glm::vec3 newArray[]); 
+void ReadingPlayerFull(glm::vec3 newArray[]);

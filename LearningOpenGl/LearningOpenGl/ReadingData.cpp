@@ -132,12 +132,7 @@ void ReadingPlayer2(glm::vec3 newArray[])
 	i = 0;
 };
 
-glm::vec3 ReadingPlayer3()
-{
-
-};
-
-void HeatMapData(glm::vec3 SquaresArray[], glm::vec3 ColorArray[])
+void ReadingPlayer3(glm::vec3 newArray[])
 {
 	string line;
 	int MaxNum = 0;
@@ -149,11 +144,10 @@ void HeatMapData(glm::vec3 SquaresArray[], glm::vec3 ColorArray[])
 		istringstream in(line);
 		string type;
 		in >> type;
-		if (type == "Player")
 		{
 			int ClientNum;
 			in >> ClientNum;
-			if (ClientNum == 0)
+			if (ClientNum == 3)
 			{
 				getline(myLogFile, line);
 				istringstream in(line);
@@ -163,7 +157,7 @@ void HeatMapData(glm::vec3 SquaresArray[], glm::vec3 ColorArray[])
 				{
 					float x, y;
 					in >> x >> y;
-					ColorArray[i] = glm::vec3(x, y, 0.0f);
+					newArray[i] = glm::vec3(x, y, 0.0f);
 					i++;
 				}
 			}
@@ -171,3 +165,31 @@ void HeatMapData(glm::vec3 SquaresArray[], glm::vec3 ColorArray[])
 	}
 	i = 0;
 };
+
+void ReadingPlayerFull(glm::vec3 newArray[])
+{
+	string line;
+	float MaxNum = 0;
+
+	cout << "Enters Reading Data" << endl;
+	int i = 0;
+	for (string line; getline(myLogFile, line);)
+	{
+		istringstream in(line);
+		string PosLine;
+		in >> PosLine;
+		if (PosLine == "CurrentPos")
+		{
+			float x, y;
+			in >> x >> y;
+			newArray[i] = glm::vec3(x, y, 0.0f);
+			if (MaxNum > x)
+			{
+				MaxNum = x;
+			}
+			i++;
+		}
+	}
+	i = 0;
+	cout << "#####" << MaxNum << "#####" << endl;
+}
