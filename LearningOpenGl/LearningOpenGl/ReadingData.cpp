@@ -16,21 +16,23 @@
 
 using namespace std;
 
-ifstream myLogFile;
-
-void fileOpen()
-{
-	myLogFile.open("C:\\Users\\Dan\\Desktop\\DataForReading.txt");
-}
-
-void fileClose()
-{
-	myLogFile.close();
-}
+//ifstream myLogFile;
+//
+//void fileOpen()
+//{
+//	myLogFile.open("C:\\Users\\Dan\\Desktop\\DataForReading.txt");
+//}
+//
+//void fileClose()
+//{
+//	myLogFile.close();
+//}
 
 void ReadingPlayer0(glm::vec3 newArray[])
 {
+	ifstream myLogFile;
 	string line;
+	myLogFile.open("C:\\Users\\Dan\\Desktop\\DataForReading.txt");
 	int MaxNum = 0;
 
 	cout << "Enters Reading Data";
@@ -65,7 +67,9 @@ void ReadingPlayer0(glm::vec3 newArray[])
 
 void ReadingPlayer1(glm::vec3 newArray[])
 {
+	ifstream myLogFile;
 	string line;
+	myLogFile.open("C:\\Users\\Dan\\Desktop\\DataForReading.txt");
 	int MaxNum = 0;
 
 	cout << "Enters Reading Data";
@@ -100,7 +104,9 @@ void ReadingPlayer1(glm::vec3 newArray[])
 
 void ReadingPlayer2(glm::vec3 newArray[])
 {
+	ifstream myLogFile;
 	string line;
+	myLogFile.open("C:\\Users\\Dan\\Desktop\\DataForReading.txt");
 	int MaxNum = 0;
 
 	cout << "Enters Reading Data";
@@ -134,7 +140,9 @@ void ReadingPlayer2(glm::vec3 newArray[])
 
 void ReadingPlayer3(glm::vec3 newArray[])
 {
+	ifstream myLogFile;
 	string line;
+	myLogFile.open("C:\\Users\\Dan\\Desktop\\DataForReading.txt");
 	int MaxNum = 0;
 
 	cout << "Enters Reading Data";
@@ -168,8 +176,10 @@ void ReadingPlayer3(glm::vec3 newArray[])
 
 void ReadingPlayerFull(glm::vec3 newArray[])
 {
+	ifstream myLogFile;
 	string line;
-	float MaxNum = 0;
+	myLogFile.open("C:\\Users\\Dan\\Desktop\\DataForReading.txt");
+	int MaxNum = 0;
 
 	cout << "Enters Reading Data" << endl;
 	int i = 0;
@@ -183,13 +193,8 @@ void ReadingPlayerFull(glm::vec3 newArray[])
 			float x, y;
 			in >> x >> y;
 			newArray[i] = glm::vec3(x, y, 0.0f);
-			if (MaxNum > x)
-			{
-				MaxNum = x;
-			}
 			i++;
 		}
 	}
 	i = 0;
-	cout << "#####" << MaxNum << "#####" << endl;
-}
+};
