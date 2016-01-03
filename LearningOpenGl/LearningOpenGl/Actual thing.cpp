@@ -53,14 +53,15 @@ void HeatMap();
 // --- Player Variables ---
 const int ColorArray = 60000;
 glm::vec3 HeatMapSquares[ColorArray];
-int ColorPicker[ColorArray];
+int ColorPickerFull[ColorArray];
 const int PosArray = 150000;
 glm::vec3 playerPos0[PosArray];
 glm::vec3 playerPos1[PosArray];
 glm::vec3 playerPos2[PosArray];
 glm::vec3 playerPos3[PosArray];
 glm::vec3 playerPosFull[PosArray];
-int WhichPlayer;
+int WhichTrajectory = 0;
+int WhichHeatMap = 0;
 
 GLfloat colorBlue = 0.0f;
 GLfloat colorRed = 0.0f;
@@ -164,7 +165,7 @@ int main()
 	CreateSquareArray(HeatMapSquares);
 	
 	ReadingPlayerFull(playerPosFull);
-	CheckWithin(HeatMapSquares, playerPosFull, ColorPicker);
+	CheckWithin(HeatMapSquares, playerPosFull, ColorPickerFull);
 
 	ReadingPlayer0(playerPos0);
 	ReadingPlayer1(playerPos1);
@@ -466,26 +467,33 @@ void do_movement()
 
 void switchPlayer()
 {
-	if (keys[GLFW_KEY_1])
+	if (WhichTrajectory < 11)
 	{
-		WhichPlayer = 0;
+		if (keys[GLFW_KEY_1])
+		{
+			WhichTrajectory = WhichTrajectory + 1;
+			if (WhichTrajectory > -1 && WhichTrajectory < 11)
+			{
+				cout << "Player: " << WhichTrajectory << endl;
+			}
+		}
 	}
-	if (keys[GLFW_KEY_2])
+	if (WhichTrajectory > -1)
 	{
-		WhichPlayer = 1;
+		if (keys[GLFW_KEY_2])
+		{
+			WhichTrajectory = WhichTrajectory - 1;
+			if (WhichTrajectory > -1 && WhichTrajectory < 11)
+			{
+				cout << "Player: " << WhichTrajectory << endl;
+			}
+			if (WhichTrajectory = -1)
+			{
+				cout << "Tragectories Off" << endl;
+			}
+		}
 	}
-	if (keys[GLFW_KEY_3])
-	{
-		WhichPlayer = 2;
-	}
-	if (keys[GLFW_KEY_4])
-	{
-		WhichPlayer = 3;
-	}
-	if (keys[GLFW_KEY_5])
-	{
-		WhichPlayer = 4;
-	}
+
 }
 
 void CheckWithin(glm::vec3 Square[], glm::vec3 PlayerPos[], int ColourArray[])
@@ -726,7 +734,7 @@ void colourpicker(int noOfInts)
 
 void Trajection()
 {
-	switch (WhichPlayer)
+	switch (WhichTrajectory)
 	{
 	case 0:
 		for (GLuint i = 0; i < PosArray; i++)
@@ -736,10 +744,9 @@ void Trajection()
 				glUniform4f(vertexColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPos0[i]);
-				//trans = glm::translate(trans, cubePositions[i]);
 				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-				glDrawArrays(GL_TRIANGLES, 0, 6); // Draws the Triangle (Type of drawing, Unknown, number of vertices)
+				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
 		}
 		break;
@@ -748,14 +755,12 @@ void Trajection()
 		{
 			if (playerPos1[i].x != 0 && playerPos1[i].y != 0)
 			{
-				glUniform4f(vertexColorLocation, .0f, 1.0f, 0.0f, 1.0f);
+				glUniform4f(vertexColorLocation, 0.0f, 1.0f, 0.0f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPos1[i]);
-				//trans = glm::translate(trans, cubePositions[i]);
-				//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
 				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-				glDrawArrays(GL_TRIANGLES, 0, 6); // Draws the Triangle (Type of drawing, Unknown, number of vertices)
+				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
 		}
 		break;
@@ -764,14 +769,12 @@ void Trajection()
 		{
 			if (playerPos2[i].x != 0 && playerPos2[i].y != 0)
 			{
-				glUniform4f(vertexColorLocation, .0f, 1.0f, 0.0f, 1.0f);
+				glUniform4f(vertexColorLocation, 1.0f, 1.0f, 0.0f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPos2[i]);
-				//trans = glm::translate(trans, cubePositions[i]);
-				//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
 				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-				glDrawArrays(GL_TRIANGLES, 0, 6); // Draws the Triangle (Type of drawing, Unknown, number of vertices)
+				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
 		}
 		break;
@@ -780,18 +783,18 @@ void Trajection()
 		{
 			if (playerPos3[i].x != 0 && playerPos3[i].y != 0)
 			{
-				glUniform4f(vertexColorLocation, .0f, 1.0f, 0.0f, 1.0f);
+				glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPos3[i]);
-				//trans = glm::translate(trans, cubePositions[i]);
-				//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
 				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-				glDrawArrays(GL_TRIANGLES, 0, 6); // Draws the Triangle (Type of drawing, Unknown, number of vertices)
+				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
 		}
 		break;
 	default:
+		glUniform4f(vertexColorLocation, 0.0f, 0.0f, 0.0f, 0.0f);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 		break;
 	}
 }
@@ -800,14 +803,12 @@ void HeatMap()
 {
 	for (GLuint i = 0; i < ColorArray; i++)
 	{
-		colourpicker(ColorPicker[i]);
+		colourpicker(ColorPickerFull[i]);
 		glUniform4f(vertexColorLocation, colorRed, colorGreen, colorBlue, 1.0f);
 		glm::mat4 trans;
 		trans = glm::translate(trans, HeatMapSquares[i]);
-		//trans = glm::translate(trans, cubePositions[i]);
-		//trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
 		GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-		glDrawArrays(GL_TRIANGLES, 0, 6); // Draws the Triangle (Type of drawing, Unknown, number of verticess 
+		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 }

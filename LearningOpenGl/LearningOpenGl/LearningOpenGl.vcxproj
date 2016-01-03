@@ -46,8 +46,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Dan\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Dan\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs\Bitch;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Computing\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Computing\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs\Bitch;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
