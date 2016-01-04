@@ -2,6 +2,7 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+#include <map>
 
 // GLEW
 #define GLEW_STATIC
@@ -19,11 +20,12 @@
 using namespace std;
 
 // --- Shader Creation ---
+GLuint VBOs[3], VAOs[3];
 GLuint shaderProgram;
 GLint vertexColorLocation;
 
 // --- Window Dimensions ---
-const GLuint WIDTH = 800, HEIGHT = 800;
+const GLuint WIDTH = 900, HEIGHT = 900;
 
 // --- Input Function ---
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
@@ -37,32 +39,47 @@ glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 cameraRight = glm::vec3(1.0f, 0.0f, 0.0f);
 bool keys[1024];
 
-// --- Deltatimte ---
+// --- Deltatime ---
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
 
 // --- HeatMap ---
 void CheckWithin(glm::vec3 SquaresArray[], glm::vec3 PlayerPos[], int ColourArray[]);
 void CreateSquareArray(glm::vec3 SquaresArray[]);
+void CheckDeath(glm::vec3 SquaresArray[], glm::vec3 PlayerPos[], int ColourArray[]);
+void CreateDeathArray(glm::vec3 SquaresArrayTwo[]);
 void colourpicker(int NoOfInts);
+void deathcolourpicker(int noOfIntTwo);
 
 // --- Creation ---
 void Trajection();
 void HeatMap();
+void DeathMap();
 
 // --- Player Variables ---
 const int ColorArray = 60000;
+const int DeathArray = 8100;
 glm::vec3 HeatMapSquares[ColorArray];
+glm::vec3 DeathMapSquares[DeathArray];
 int ColorPickerFull[ColorArray];
-const int PosArray = 150000;
+int ColorPickerDeath[DeathArray];
+const int PosArray = 200000;
 glm::vec3 playerPos0[PosArray];
 glm::vec3 playerPos1[PosArray];
 glm::vec3 playerPos2[PosArray];
 glm::vec3 playerPos3[PosArray];
+glm::vec3 playerPos4[PosArray];
+glm::vec3 playerPos5[PosArray];
+glm::vec3 playerPos6[PosArray];
+glm::vec3 playerPos7[PosArray];
+glm::vec3 playerPos8[PosArray];
+glm::vec3 playerPos9[PosArray];
 glm::vec3 playerPosFull[PosArray];
+glm::vec3 playerPosDeath[PosArray];
 int WhichTrajectory = 0;
 int WhichHeatMap = 0;
 
+// --- Colours ---
 GLfloat colorBlue = 0.0f;
 GLfloat colorRed = 0.0f;
 GLfloat colorGreen = 0.0f;
@@ -117,31 +134,22 @@ output_variable_name = weird_stuff_we_processed;
 const GLchar* vertexShaderSource = "#version 330 core\n"
 
 "layout (location = 0) in vec3 position;\n"
-"layout(location = 1) in vec2 texCoord;\n"
 
-"out vec4 vertexColor;\n" // Specify a color output to the fragment shader
-"out vec2 TexCoord;\n"
+"out vec4 vertexColor;\n"
 
 "uniform mat4 transform;\n"
-"uniform mat4 model;\n"
 "uniform mat4 view;\n"
 "uniform mat4 projection;\n"
 
 "void main()\n"
 "{\n"
-
-//"gl_Position = projection * view * vec4(position, 1.0f);\n" // Default
-"gl_Position = projection * view * transform * vec4(position, 1.0f);\n" // With Translations
-"vertexColor = vec4(0.5f, 0.0f, 0.0f, 1.0f);\n"
-"TexCoord = vec2(texCoord.x, 1.0 - texCoord.y);\n"
-
+"gl_Position = projection * view * transform * vec4(position, 1.0f);\n"
 "}\n";
 
 // ========================
 // --- Fragment Shader ---
 // ========================
 const GLchar* fragmentShaderSource = "#version 330 core\n"
-// "in vec4 vertexColor;\n" // Recieves the output data from the vertex shader
 
 "out vec4 color;\n"
 
@@ -159,37 +167,36 @@ int main()
 {
 	cout << "Start Program\n";
 
-	// --- Getting Player Data ---
-	//fileOpen();
-
+	// =====================
+	// --- Reading Data ---
+	// =====================
 	CreateSquareArray(HeatMapSquares);
+	CreateDeathArray(DeathMapSquares);
 	
-	ReadingPlayerFull(playerPosFull);
+	ReadingData(playerPos0, playerPos1, playerPos2, playerPos3, playerPos4, playerPos5, playerPos6, playerPos7, playerPos8, playerPos9, playerPosFull);
+	ReadingDeath(playerPosDeath);
+
 	CheckWithin(HeatMapSquares, playerPosFull, ColorPickerFull);
+	CheckDeath(DeathMapSquares, playerPosDeath, ColorPickerDeath);
 
-	ReadingPlayer0(playerPos0);
-	ReadingPlayer1(playerPos1);
-	ReadingPlayer2(playerPos2);
-	ReadingPlayer3(playerPos3);
-
-	// - With the vertex shader, each input variable is know as a "Vertex Attribute" -
-	// - We are limited by the hardware to how many of these we can declare by we are guaranted at least 16 4-Component Vertex Attributes -
-	// - Checks how many vertex attributes my hardware allows for -
+	// ===================
+	// --- Attributes ---
+	// ===================
 	GLint nrAttributes;
 	glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &nrAttributes);
 	std::cout << "Maximum nr of vertex attributes supported: " << nrAttributes << std::endl;
 
-	// --- Iniitialize GLFW ---
+	// ========================
+	// --- INITIALIZE GLFW ---
+	// ========================
 	glfwInit();
 
 	// --- Configure GLFW ---
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE); // - Not Resizable by the user
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-											  // --- CREATING A WINDOW ---
-											  // FULL SCREEN??? glfwGetPrimaryMonitor() for first nullptr
 	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", nullptr, nullptr); // --- Width - Height - Title - Window? - Unknown ---
 	glfwMakeContextCurrent(window);
 	if (window == NULL)
@@ -199,7 +206,9 @@ int main()
 		return -1;
 	}
 
+	// ========================
 	// --- INITIALIZE GLEW ---
+	//=========================
 	glewExperimental = GL_TRUE; // - Activates Modern Versions of GLEW
 	if (glewInit() != GLEW_OK)
 	{
@@ -207,16 +216,19 @@ int main()
 		return -1;
 	}
 
+	// ======================================
 	// --- Call The KeyCallBack Function ---
+	// ======================================
 	glfwSetKeyCallback(window, key_callback);
 
+	// =========================================
 	// --- Initialize the Viewport (Camera) ---
-	glViewport(0, 0, WIDTH, HEIGHT); // --- Location of bottom left corner of the window - width - height ---
+	// =========================================
+	glViewport(0, 0, WIDTH, HEIGHT);
 
-								// --- glViewport is basically a worldpoint to screenpoint transformer ---
-
-								// --- SHADER COMPILER ---
-								// -- Vertex Shader -- 
+	// ======================
+	// --- Vertex Shader ---
+	// ======================
 
 	GLuint vertexShader; // - Creates the shader object -
 	vertexShader = glCreateShader(GL_VERTEX_SHADER); // - Defines what kind of shader we want -
@@ -235,7 +247,9 @@ int main()
 		cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << endl;
 	}
 
-	// -- Fragment Shader --
+	// ========================
+	// --- Fragment Shader ---
+	// ========================
 
 	GLuint fragmentShader;
 	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -252,9 +266,9 @@ int main()
 		cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << endl;
 	}
 
-	// -- Program Shaders --
-	// - To actually use the shaders we just made, we need to link them together to form the pipeline -
-
+	// ========================
+	// --- Program Shaders ---
+	// ========================
 	shaderProgram = glCreateProgram(); // - Creates a programa and returns an ID to the program object (shaderProgram) -
 
 	glAttachShader(shaderProgram, vertexShader); // - attaches the vertex shador to the program -
@@ -295,26 +309,22 @@ int main()
 		5.0f, 5.0f, 0.0f
 	};
 
-	// --- Testing the Positions ---
-	//glm::vec3 cubePositions[] = {
-	//	glm::vec3(0.0f,  0.0f,  0.0f),
-	//	glm::vec3(2.0f,  5.0f, 0.0f),
-	//	glm::vec3(-1.5f, -2.2f, 0.0f),
-	//	glm::vec3(-3.8f, -2.0f, 0.0f),
-	//	glm::vec3(2.4f, -0.4f, 0.0f),
-	//	glm::vec3(-1.7f,  3.0f, 0.0f),
-	//	glm::vec3(1.3f, -2.0f, 0.0f),
-	//	glm::vec3(1.5f,  2.0f, 0.0f),
-	//	glm::vec3(1.5f,  0.2f, 0.0f),
-	//	glm::vec3(-1.3f,  1.0f, 0.0f)
-	//};
+	GLfloat SquareForDeathMap[] = {
+		-12.5f, -12.5f, 0.0f,
+		12.5f, -12.5f, 0.0f,
+		12.5f, 12.5f, 0.0f,
+
+		-12.5f, -12.5f, 0.0f,
+		-12.5f, 12.5f, 0.0f,
+		12.5f, 12.5f, 0.0f
+	};
 
 	// =================================
 	// --- Setting Up The Triangles ---
 	// =================================
-	GLuint VBOs[2], VAOs[2];
-	glGenVertexArrays(2, VAOs);
-	glGenBuffers(2, VBOs);
+	//GLuint VBOs[2], VAOs[2];
+	glGenVertexArrays(3, VAOs);
+	glGenBuffers(3, VBOs);
 
 	// ============================
 	// --- Trajectory Squares ---
@@ -326,12 +336,22 @@ int main()
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0); 
 
-	// ========================
-	// --- HeatMap Squares ---
-	// ========================
+	// ======================================
+	// --- HeatMap Squares For Positions ---
+	// ======================================
 	glBindVertexArray(VAOs[1]);
 	glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(SquareForHeatMap), SquareForHeatMap, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+	glEnableVertexAttribArray(0);
+	glBindVertexArray(0);
+
+	// ===================================
+	// --- HeatMap Squares For Deaths ---
+	// ===================================
+	glBindVertexArray(VAOs[2]);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOs[2]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(SquareForDeathMap), SquareForDeathMap, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
@@ -385,13 +405,9 @@ int main()
 		// Note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
+		// ================
 		// --- Colours ---
-
-		//GLfloat timeValue = glfwGetTime(); // Run time in seconds
-		//GLfloat greenValue = ((sin(timeValue) / 2) + 0.5); // Vary the colour based on sin/cos
-		//GLfloat redValue = ((sin(timeValue) / 2) + 0.5); // Vary the colour based on sin/cos
-		//GLfloat blueValue = ((sin(timeValue) / 2) + 0.5); // Vary the colour based on sin/cos
-
+		// ================
 		vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor"); // gets the uniforms location
 		colorRed = 1.0f;
 		colorBlue = 0.0f;
@@ -401,12 +417,15 @@ int main()
 		// ===============================
 		// --- Spawning the triangles ---
 		// ===============================
-		glBindVertexArray(VAOs[1]);
-		HeatMap();
-		//glDrawArrays(GL_TRIANGLES, 0, 6); // --- Default ---
+		glBindVertexArray(VAOs[2]);
+		DeathMap();
 
-		glBindVertexArray(VAOs[0]);
-		Trajection();
+		//glBindVertexArray(VAOs[1]);
+		//HeatMap();
+		////glDrawArrays(GL_TRIANGLES, 0, 6); // --- Default ---
+
+		//glBindVertexArray(VAOs[0]);
+		//Trajection();
 		//glDrawArrays(GL_TRIANGLES, 0, 3); // --- Default ---
 		
 		glBindVertexArray(0);
@@ -420,7 +439,7 @@ int main()
 	glDeleteBuffers(2, VBOs);
 
 	// =================
-	// --- End Main ---
+	// --- End Main --- 
 	// =================
 	glfwTerminate();
 	return 0;
@@ -467,7 +486,7 @@ void do_movement()
 
 void switchPlayer()
 {
-	if (WhichTrajectory < 11)
+	if (WhichTrajectory < 10)
 	{
 		if (keys[GLFW_KEY_1])
 		{
@@ -478,7 +497,7 @@ void switchPlayer()
 			}
 		}
 	}
-	if (WhichTrajectory > -1)
+	if (WhichTrajectory > 0)
 	{
 		if (keys[GLFW_KEY_2])
 		{
@@ -487,31 +506,56 @@ void switchPlayer()
 			{
 				cout << "Player: " << WhichTrajectory << endl;
 			}
-			if (WhichTrajectory = -1)
-			{
-				cout << "Tragectories Off" << endl;
-			}
 		}
+	}
+	if (keys[GLFW_KEY_3])
+	{
+		WhichTrajectory = -1;
+		cout << "Trajectories Off" << endl;
 	}
 
 }
 
 void CheckWithin(glm::vec3 Square[], glm::vec3 PlayerPos[], int ColourArray[])
 {
+		int ColorNum = 0;
+		for (int i = 0; i < ColorArray; i++)
+		{
+			for (int j = 0; j < PosArray; j++)
+			{
+				if ((PlayerPos[j].x != 0) && (PlayerPos[j].y != 0))
+				{
+					if ((PlayerPos[j].x < (Square[i].x + 5)) && (PlayerPos[j].x >(Square[i].x - 5)) && (PlayerPos[j].y < (Square[i].y + 5)) && (PlayerPos[j].y >(Square[i].y - 5)))
+					{
+						ColorNum++;
+					}
+				}
+			}
+			ColourArray[i] = ColorNum;
+			if (ColourArray[i] < 0)
+			{
+				ColourArray[i] = 0;
+			}
+			ColorNum = 0;
+		}
+}
+
+void CheckDeath(glm::vec3 Square[], glm::vec3 PlayerPos[], int ColourArray[])
+{
 	int ColorNum = 0;
-	for (int i = 0; i < ColorArray; i++)
+	for (int i = 0; i < DeathArray; i++)
 	{
 		for (int j = 0; j < PosArray; j++)
 		{
 			if ((PlayerPos[j].x != 0) && (PlayerPos[j].y != 0))
 			{
-				if ((PlayerPos[j].x < (Square[i].x + 5)) && (PlayerPos[j].x >(Square[i].x - 5)) && (PlayerPos[j].y < (Square[i].y + 5)) && (PlayerPos[j].y >(Square[i].y - 5)))
+				if ((PlayerPos[j].x < (Square[i].x + 12.5)) && (PlayerPos[j].x >(Square[i].x - 12.5)) && (PlayerPos[j].y < (Square[i].y + 12.5)) && (PlayerPos[j].y >(Square[i].y - 12.5)))
 				{
 					ColorNum++;
-					
 				}
 			}
 		}
+		cout << ColorNum << endl;
 		ColourArray[i] = ColorNum;
 		if (ColourArray[i] < 0)
 		{
@@ -521,22 +565,41 @@ void CheckWithin(glm::vec3 Square[], glm::vec3 PlayerPos[], int ColourArray[])
 	}
 }
 
-void CreateSquareArray(glm::vec3 SquareList[])
+void CreateSquareArray(glm::vec3 SquaresArray[])
 {
 	//Spawn squares every 10 points along the coords
 	// Max Point: (1230, 1750), Min Point: (-490, -250)
 	// 1750
-	int k = 0;
+		int k = 0;
 
-	int x = 1755;
-	for (int i = 0; i < 225; i++)
-	{
-		x = x - 10;
-		int y = 1755;
-		for (int j = 0; j < 225; j++)
+		int x = 1755;
+		for (int i = 0; i < 225; i++)
 		{
-			y = y - 10;
-			SquareList[k] = glm::vec3(x, y, 1.0f);
+			x = x - 10;
+			int y = 1755;
+			for (int j = 0; j < 225; j++)
+			{
+				y = y - 10;
+				SquaresArray[k] = glm::vec3(x, y, 1.0f);
+				k++;
+			}
+		}
+		k = 0;
+}
+
+void CreateDeathArray(glm::vec3 SquaresArrayTwo[])
+{
+	int k = 0;
+	float x = 1762.5;
+
+	for (int i = 0; i < 90; i++)
+	{
+		x = x - 25;
+		float y = 1762.5;
+		for (int j = 0; j < 90; j++)
+		{
+			y = y - 25;
+			SquaresArrayTwo[k] = glm::vec3(x, y, 1.0f);
 			k++;
 		}
 	}
@@ -732,6 +795,172 @@ void colourpicker(int noOfInts)
 	}
 }
 
+void deathcolourpicker(int noOfIntsTwo)
+{
+	if (noOfIntsTwo > -1 && noOfIntsTwo < 10)
+	{
+		colorRed = 0.0f;
+		colorGreen = 0.0f;
+		colorBlue = 0.0f;
+	}
+	if (noOfIntsTwo > 9 && noOfIntsTwo < 20)
+	{
+		colorRed = 0.0f;
+		colorGreen = 0.0f;
+		colorBlue = 0.2f;
+	}
+	if (noOfIntsTwo > 19 && noOfIntsTwo < 30)
+	{
+		colorRed = 0.0f;
+		colorGreen = 0.0f;
+		colorBlue = 0.4f;
+	}
+	if (noOfIntsTwo > 29 && noOfIntsTwo < 40)
+	{
+		colorRed = 0.0f;
+		colorGreen = 0.0f;
+		colorBlue = 0.6f;
+	}
+	if (noOfIntsTwo > 39 && noOfIntsTwo < 50)
+	{
+		colorRed = 0.0f;
+		colorGreen = 0.0f;
+		colorBlue = 0.8f;
+	}
+	if (noOfIntsTwo > 49 && noOfIntsTwo < 60)
+	{
+		colorRed = 0.0f;
+		colorGreen = 0.0f;
+		colorBlue = 1.0f;
+	}
+	if (noOfIntsTwo > 59 && noOfIntsTwo < 70)
+	{
+		colorRed = 0.0f;
+		colorGreen = 0.2f;
+		colorBlue = 1.0f;
+	}
+	if (noOfIntsTwo > 69 && noOfIntsTwo < 80)
+	{
+		colorRed = 0.0f;
+		colorGreen = 0.4f;
+		colorBlue = 1.0f;
+	}
+	if (noOfIntsTwo > 79 && noOfIntsTwo < 90)
+	{
+		colorRed = 0.0f;
+		colorGreen = 0.6f;
+		colorBlue = 1.0f;
+	}
+	if (noOfIntsTwo > 89 && noOfIntsTwo < 100)
+	{
+		colorRed = 0.0f;
+		colorGreen = 0.8f;
+		colorBlue = 1.0f;
+	}
+	if (noOfIntsTwo > 99 && noOfIntsTwo < 110)
+	{
+		colorRed = 0.0f;
+		colorGreen = 1.0f;
+		colorBlue = 1.0f;
+	}
+	if (noOfIntsTwo > 109 && noOfIntsTwo < 120)
+	{
+		colorRed = 0.0f;
+		colorGreen = 1.0f;
+		colorBlue = 0.8f;
+	}
+	if (noOfIntsTwo > 119 && noOfIntsTwo < 130)
+	{
+		colorRed = 0.0f;
+		colorGreen = 1.0f;
+		colorBlue = 0.6f;
+	}
+	if (noOfIntsTwo > 129 && noOfIntsTwo < 140)
+	{
+		colorRed = 0.0f;
+		colorGreen = 1.0f;
+		colorBlue = 0.4f;
+	}
+	if (noOfIntsTwo > 139 && noOfIntsTwo < 150)
+	{
+		colorRed = 0.0f;
+		colorGreen = 1.0f;
+		colorBlue = 0.2f;
+	}
+	if (noOfIntsTwo > 149 && noOfIntsTwo < 160)
+	{
+		colorRed = 0.0f;
+		colorGreen = 1.0f;
+		colorBlue = 0.0f;
+	}
+	if (noOfIntsTwo > 159 && noOfIntsTwo < 170)
+	{
+		colorRed = 0.2f;
+		colorGreen = 1.0f;
+		colorBlue = 0.0f;
+	}
+	if (noOfIntsTwo > 169 && noOfIntsTwo < 180)
+	{
+		colorRed = 0.4f;
+		colorGreen = 1.0f;
+		colorBlue = 0.0f;
+	}
+	if (noOfIntsTwo > 179 && noOfIntsTwo < 190)
+	{
+		colorRed = 0.6f;
+		colorGreen = 1.0f;
+		colorBlue = 0.0f;
+	}
+	if (noOfIntsTwo > 189 && noOfIntsTwo < 200)
+	{
+		colorRed = 0.8f;
+		colorGreen = 1.0f;
+		colorBlue = 0.0f;
+	}
+	if (noOfIntsTwo > 199 && noOfIntsTwo < 210)
+	{
+		colorRed = 1.0f;
+		colorGreen = 1.0f;
+		colorBlue = 0.0f;
+	}
+	if (noOfIntsTwo > 209 && noOfIntsTwo < 220)
+	{
+		colorRed = 1.0f;
+		colorGreen = 0.8f;
+		colorBlue = 0.0f;
+	}
+	if (noOfIntsTwo > 219 && noOfIntsTwo < 230)
+	{
+		colorRed = 1.0f;
+		colorGreen = 0.6f;
+		colorBlue = 0.0f;
+	}
+	if (noOfIntsTwo > 229 && noOfIntsTwo < 240)
+	{
+		colorRed = 1.0f;
+		colorGreen = 0.4f;
+		colorBlue = 0.0f;
+	}
+	if (noOfIntsTwo > 239 && noOfIntsTwo < 250)
+	{
+		colorRed = 1.0f;
+		colorGreen = 0.2f;
+		colorBlue = 0.0f;
+	}
+	if (noOfIntsTwo > 249 && noOfIntsTwo < 260)
+	{
+		colorRed = 1.0f;
+		colorGreen = 0.0f;
+		colorBlue = 0.0f;
+	}
+	if(noOfIntsTwo > 260)
+	{
+		colorRed = 1.0f;
+		colorGreen = 0.0f;
+		colorBlue = 0.0f;
+	}
+}
+
 void Trajection()
 {
 	switch (WhichTrajectory)
@@ -799,14 +1028,40 @@ void Trajection()
 	}
 }
 
-void HeatMap() 
+void HeatMap()
 {
-	for (GLuint i = 0; i < ColorArray; i++)
+
+		for (GLuint i = 0; i < ColorArray; i++)
+		{
+			colourpicker(ColorPickerFull[i]);
+			glUniform4f(vertexColorLocation, colorRed, colorGreen, colorBlue, 1.0f);
+			glm::mat4 trans;
+			trans = glm::translate(trans, HeatMapSquares[i]);
+			GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+			glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+		}
+
+		//for (GLuint i = 0; i < ColorArray; i++)
+		//{
+		//	colourpicker(ColorPickerDeath[i]);
+		//	glUniform4f(vertexColorLocation, colorRed, colorGreen, colorBlue, 1.0f);
+		//	glm::mat4 trans;
+		//	trans = glm::translate(trans, HeatMapSquares[i]);
+		//	GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+		//	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+		//	glDrawArrays(GL_TRIANGLES, 0, 6);
+		//}
+}
+
+void DeathMap()
+{
+	for (GLuint i = 0; i < DeathArray; i++)
 	{
-		colourpicker(ColorPickerFull[i]);
+		deathcolourpicker(ColorPickerDeath[i]);
 		glUniform4f(vertexColorLocation, colorRed, colorGreen, colorBlue, 1.0f);
 		glm::mat4 trans;
-		trans = glm::translate(trans, HeatMapSquares[i]);
+		trans = glm::translate(trans, DeathMapSquares[i]);
 		GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 		glDrawArrays(GL_TRIANGLES, 0, 6);

@@ -16,32 +16,32 @@
 
 using namespace std;
 
-//ifstream myLogFile;
-//
-//void fileOpen()
-//{
-//	myLogFile.open("C:\\Users\\Dan\\Desktop\\DataForReading.txt");
-//}
-//
-//void fileClose()
-//{
-//	myLogFile.close();
-//}
-
 void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 newArrayTwo[], glm::vec3 newArrayThree[], glm::vec3 newArrayFour[], glm::vec3 newArrayFive[], glm::vec3 newArraySix[], glm::vec3 newArraySeven[], glm::vec3 newArrayEight[], glm::vec3 newArrayNine[], glm::vec3 newArrayAll[])
 {
 	ifstream myLogFile;
 	string line;
-	myLogFile.open("C:\\Users\\Computing\\Desktop\\DataForReading.txt");
+	myLogFile.open("C:\\Users\\Computing\\Desktop\\DataForReading2.txt");
 	int MaxNum = 0;
 
-	cout << "Enters Reading Data" << endl;
+	cout << "Begins Reading Data" << endl;
+	int a = 0;
+	int b = 0;
+	int c = 0;
+	int d = 0;
+	int e = 0;
+	int f = 0;
+	int g = 0;
+	int h = 0;
+	int m = 0;
+	int n = 0;
+	int o = 0;
 	int i = 0;
 	for (string line; getline(myLogFile, line);)
 	{
 		istringstream in(line);
 		string type;
 		in >> type;
+		if (type == "Player")
 		{
 			int ClientNum;
 			in >> ClientNum;
@@ -55,9 +55,10 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 				{
 					float x, y;
 					in >> x >> y;
-					newArrayZero[i] = glm::vec3(x, y, 0.0f);
+					newArrayZero[a] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
 					i++;
+					a++;
 				}
 			}
 			if (ClientNum == 1)
@@ -70,9 +71,10 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 				{
 					float x, y;
 					in >> x >> y;
-					newArrayOne[i] = glm::vec3(x, y, 0.0f);
+					newArrayOne[b] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
 					i++;
+					b++;
 				}
 			}
 			if (ClientNum == 2)
@@ -85,9 +87,10 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 				{
 					float x, y;
 					in >> x >> y;
-					newArrayTwo[i] = glm::vec3(x, y, 0.0f);
+					newArrayTwo[c] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
 					i++;
+					c++;
 				}
 			}
 			if (ClientNum == 3)
@@ -100,9 +103,10 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 				{
 					float x, y;
 					in >> x >> y;
-					newArrayThree[i] = glm::vec3(x, y, 0.0f);
+					newArrayThree[d] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
 					i++;
+					d++;
 				}
 			}
 			if (ClientNum == 4)
@@ -115,9 +119,10 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 				{
 					float x, y;
 					in >> x >> y;
-					newArrayFour[i] = glm::vec3(x, y, 0.0f);
+					newArrayFour[e] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
 					i++;
+					e++;
 				}
 			}
 			if (ClientNum == 5)
@@ -130,9 +135,10 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 				{
 					float x, y;
 					in >> x >> y;
-					newArrayFive[i] = glm::vec3(x, y, 0.0f);
+					newArrayFive[f] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
 					i++;
+					f++;
 				}
 			}
 			if (ClientNum == 6)
@@ -145,9 +151,10 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 				{
 					float x, y;
 					in >> x >> y;
-					newArraySix[i] = glm::vec3(x, y, 0.0f);
+					newArraySix[g] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
 					i++;
+					g++;
 				}
 			}
 			if (ClientNum == 7)
@@ -160,9 +167,10 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 				{
 					float x, y;
 					in >> x >> y;
-					newArraySeven[i] = glm::vec3(x, y, 0.0f);
+					newArraySeven[h] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
 					i++;
+					h++;
 				}
 			}
 			if (ClientNum == 8)
@@ -175,9 +183,10 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 				{
 					float x, y;
 					in >> x >> y;
-					newArrayEight[i] = glm::vec3(x, y, 0.0f);
+					newArrayEight[m] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
 					i++;
+					m++;
 				}
 			}
 			if (ClientNum == 9)
@@ -190,183 +199,42 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 				{
 					float x, y;
 					in >> x >> y;
-					newArrayNine[i] = glm::vec3(x, y, 0.0f);
+					newArrayNine[n] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
 					i++;
+					n++;
 				}
 			}
 		}
 	}
 	i = 0;
+	myLogFile.close();
+	cout << "Exits Player Data" << endl;
 }
 
-void ReadingPlayer0(glm::vec3 newArray[])
+void ReadingDeath(glm::vec3 newArrayDeath[])
 {
 	ifstream myLogFile;
 	string line;
 	myLogFile.open("C:\\Users\\Computing\\Desktop\\DataForReading.txt");
 	int MaxNum = 0;
 
-	cout << "Enters Reading Data" << endl;
-	int i = 0;
+	cout << "Begins Reading Death" << endl;
+
+	int o = 0;
 	for (string line; getline(myLogFile, line);)
 	{
 		istringstream in(line);
 		string type;
 		in >> type;
-		if (type == "Player")
-		{
-			int ClientNum;
-			in >> ClientNum;
-			if (ClientNum == 0)
-			{
-				getline(myLogFile, line);
-				istringstream in(line);
-				string PosLine;
-				in >> PosLine;
-				if (PosLine == "CurrentPos")
-				{
-					float x, y;
-					in >> x >> y;
-					newArray[i] = glm::vec3(x, y, 0.0f);
-					i++;
-				}
-			}
-		}
-	}
-	i = 0;
-};
-
-void ReadingPlayer1(glm::vec3 newArray[])
-{
-	ifstream myLogFile;
-	string line;
-	myLogFile.open("C:\\Users\\Computing\\Desktop\\DataForReading.txt");
-	int MaxNum = 0;
-
-	cout << "Enters Reading Data" << endl;
-	int i = 0;
-	for (string line; getline(myLogFile, line);)
-	{
-		istringstream in(line);
-		string type;
-		in >> type;
-		if (type == "Player")
-		{
-			int ClientNum;
-			in >> ClientNum;
-			if (ClientNum == 1)
-			{
-				getline(myLogFile, line);
-				istringstream in(line);
-				string PosLine;
-				in >> PosLine;
-				if (PosLine == "CurrentPos")
-				{
-					float x, y;
-					in >> x >> y;
-					newArray[i] = glm::vec3(x, y, 0.0f);
-					i++;
-				}
-			}
-		}
-	}
-	i = 0;
-};
-
-void ReadingPlayer2(glm::vec3 newArray[])
-{
-	ifstream myLogFile;
-	string line;
-	myLogFile.open("C:\\Users\\Computing\\Desktop\\DataForReading.txt");
-	int MaxNum = 0;
-
-	cout << "Enters Reading Data" << endl;
-	int i = 0;
-	for (string line; getline(myLogFile, line);)
-	{
-		istringstream in(line);
-		string type;
-		in >> type;
-		{
-			int ClientNum;
-			in >> ClientNum;
-			if (ClientNum == 2)
-			{
-				getline(myLogFile, line);
-				istringstream in(line);
-				string PosLine;
-				in >> PosLine;
-				if (PosLine == "CurrentPos")
-				{
-					float x, y;
-					in >> x >> y;
-					newArray[i] = glm::vec3(x, y, 0.0f);
-					i++;
-				}
-			}
-		}
-	}
-	i = 0;
-};
-
-void ReadingPlayer3(glm::vec3 newArray[])
-{
-	ifstream myLogFile;
-	string line;
-	myLogFile.open("C:\\Users\\Computing\\Desktop\\DataForReading.txt");
-	int MaxNum = 0;
-
-	cout << "Enters Reading Data" << endl;
-	int i = 0;
-	for (string line; getline(myLogFile, line);)
-	{
-		istringstream in(line);
-		string type;
-		in >> type;
-		{
-			int ClientNum;
-			in >> ClientNum;
-			if (ClientNum == 3)
-			{
-				getline(myLogFile, line);
-				istringstream in(line);
-				string PosLine;
-				in >> PosLine;
-				if (PosLine == "CurrentPos")
-				{
-					float x, y;
-					in >> x >> y;
-					newArray[i] = glm::vec3(x, y, 0.0f);
-					i++;
-				}
-			}
-		}
-	}
-	i = 0;
-};
-
-void ReadingPlayerFull(glm::vec3 newArray[])
-{
-	ifstream myLogFile;
-	string line;
-	myLogFile.open("C:\\Users\\Computing\\Desktop\\DataForReading.txt");
-	int MaxNum = 0;
-
-	cout << "Enters Reading Data" << endl;
-	int i = 0;
-	for (string line; getline(myLogFile, line);)
-	{
-		istringstream in(line);
-		string PosLine;
-		in >> PosLine;
-		if (PosLine == "CurrentPos")
+		if (type == "DiedAt")
 		{
 			float x, y;
 			in >> x >> y;
-			newArray[i] = glm::vec3(x, y, 0.0f);
-			i++;
+			newArrayDeath[o] = glm::vec3(x, y, 0.0f);
+			o++;
 		}
 	}
-	i = 0;
-};
+	o = 0;
+	cout << "Begins Reading Death" << endl;
+}
