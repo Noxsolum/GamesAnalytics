@@ -20,10 +20,12 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 {
 	ifstream myLogFile;
 	string line;
-	myLogFile.open("C:\\Users\\Computing\\Desktop\\DataForReading2.txt");
+	//myLogFile.open("C:\\Users\\Computing\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading1.txt");
+	myLogFile.open("C:\\Users\\Computing\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading2.txt");
+	//myLogFile.open("C:\\Users\\Computing\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading3.txt");
 	int MaxNum = 0;
 
-	cout << "Begins Reading Data" << endl;
+	cout << "Begins Reading Data!" << endl;
 	int a = 0;
 	int b = 0;
 	int c = 0;
@@ -209,17 +211,19 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 	}
 	i = 0;
 	myLogFile.close();
-	cout << "Exits Player Data" << endl;
+	cout << "Exits Reading Data!" << endl;
 }
 
 void ReadingDeath(glm::vec3 newArrayDeath[])
 {
 	ifstream myLogFile;
 	string line;
-	myLogFile.open("C:\\Users\\Computing\\Desktop\\DataForReading.txt");
+	//myLogFile.open("C:\\Users\\Computing\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading1.txt");
+	myLogFile.open("C:\\Users\\Computing\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading2.txt");
+	//myLogFile.open("C:\\Users\\Computing\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading3.txt");
 	int MaxNum = 0;
 
-	cout << "Begins Reading Death" << endl;
+	cout << "Begins Reading Death Positions!" << endl;
 
 	int o = 0;
 	for (string line; getline(myLogFile, line);)
@@ -236,5 +240,5 @@ void ReadingDeath(glm::vec3 newArrayDeath[])
 		}
 	}
 	o = 0;
-	cout << "Begins Reading Death" << endl;
+	cout << "Ends Reading Death Positions!" << endl;
 }

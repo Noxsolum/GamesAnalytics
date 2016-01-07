@@ -19,31 +19,43 @@
 
 using namespace std;
 
+// ========================
 // --- Shader Creation ---
+// ========================
 GLuint VBOs[3], VAOs[3];
 GLuint shaderProgram;
 GLint vertexColorLocation;
 
+// ==========================
 // --- Window Dimensions ---
+// ==========================
 const GLuint WIDTH = 900, HEIGHT = 900;
 
+// =======================
 // --- Input Function ---
+// =======================
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void do_movement();
 void switchPlayer();
 
+// ===============
 // --- Camera ---
+// ===============
 glm::vec3 cameraPos = glm::vec3(415.0f, 754.0f, 2526.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 cameraRight = glm::vec3(1.0f, 0.0f, 0.0f);
 bool keys[1024];
 
+// ==================
 // --- Deltatime ---
+// ==================
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
 
+// ================
 // --- HeatMap ---
+// ================
 void CheckWithin(glm::vec3 SquaresArray[], glm::vec3 PlayerPos[], int ColourArray[]);
 void CreateSquareArray(glm::vec3 SquaresArray[]);
 void CheckDeath(glm::vec3 SquaresArray[], glm::vec3 PlayerPos[], int ColourArray[]);
@@ -51,12 +63,16 @@ void CreateDeathArray(glm::vec3 SquaresArrayTwo[]);
 void colourpicker(int NoOfInts);
 void deathcolourpicker(int noOfIntTwo);
 
+// =================
 // --- Creation ---
+// =================
 void Trajection();
 void HeatMap();
 void DeathMap();
 
+// =========================
 // --- Player Variables ---
+// =========================
 const int ColorArray = 60000;
 const int DeathArray = 8100;
 glm::vec3 HeatMapSquares[ColorArray];
@@ -78,8 +94,11 @@ glm::vec3 playerPosFull[PosArray];
 glm::vec3 playerPosDeath[PosArray];
 int WhichTrajectory = 0;
 int WhichHeatMap = 0;
+int allTrajectories = 0;
 
+// ================
 // --- Colours ---
+// ================
 GLfloat colorBlue = 0.0f;
 GLfloat colorRed = 0.0f;
 GLfloat colorGreen = 0.0f;
@@ -165,7 +184,15 @@ const GLchar* fragmentShaderSource = "#version 330 core\n"
 
 int main()
 {
-	cout << "Start Program\n";
+	// =====================
+	// --- Instructions ---
+	// =====================
+	cout << "Start Program!\n";
+	cout << "Use the WASD keys to pan the scene!\n";
+	cout << "Use Page Up and Page Down to Zoom!\n";
+	cout << "Use the '1', '2' and '3' keys to change the the individual trajectories!\n";
+	cout << "Use the '4', '5' and '6' keys to change the the heat maps!\n";
+	cout << "Use the '-' and '=' keys to turn on and off the full trajectories!\n";
 
 	// =====================
 	// --- Reading Data ---
@@ -269,20 +296,21 @@ int main()
 	// ========================
 	// --- Program Shaders ---
 	// ========================
-	shaderProgram = glCreateProgram(); // - Creates a programa and returns an ID to the program object (shaderProgram) -
+	shaderProgram = glCreateProgram();
 
-	glAttachShader(shaderProgram, vertexShader); // - attaches the vertex shador to the program -
-	glAttachShader(shaderProgram, fragmentShader); // - attaches the fragment shador to the program -
-	glLinkProgram(shaderProgram); // - Links all of the above together -
+	glAttachShader(shaderProgram, vertexShader);
+	glAttachShader(shaderProgram, fragmentShader);
+	glLinkProgram(shaderProgram);
 
-								  // --- Testing to see if the program shader properly compiles ---
 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 	if (!success) {
 		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
 		cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << endl;
 	}
 
-	// -- Delete the shaders once they are finished --
+	// ==================================================
+	// --- Delete the shaders once they are finished ---
+	// ==================================================
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
@@ -322,7 +350,6 @@ int main()
 	// =================================
 	// --- Setting Up The Triangles ---
 	// =================================
-	//GLuint VBOs[2], VAOs[2];
 	glGenVertexArrays(3, VAOs);
 	glGenBuffers(3, VBOs);
 
@@ -356,53 +383,49 @@ int main()
 	glEnableVertexAttribArray(0);
 	glBindVertexArray(0);
 
-	// - Uncommenting this line will make the wireframe triangle -
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
 	// ======================
 	// --- The Game Loop ---
 	// ======================
-
+	cout << "Begins the While Loop!" << endl;
 	while (!glfwWindowShouldClose(window))
 	{
+		// =================================================
 		// --- Calculate deltatime of the current frame ---
+		// =================================================
 		GLfloat currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		// --- Checks if any events have been activated e.g. key press ---
+		// ===================
+		// --- Key Inputs ---
+		// ===================
 		glfwPollEvents();
 		do_movement();
 		switchPlayer();
-
-		// --- Rendering Commands ---
+		
+		//=================================
 		// --- Background Color Buffer ---
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f); // --- Red, Green, Blue, Alpha ---
+		// ================================
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		// --- Drawing Our First Triangle ---
 		glUseProgram(shaderProgram);
 
+		// ===============
 		// --- Camera ---
+		// ===============
 		glm::mat4 view;
-
 		view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 		cout << glm::to_string(cameraPos) << endl;
 
-		// --- View and projection ---
 		glm::mat4 projection;
-		
-		//view = glm::translate(view, glm::vec3(-300.0f, -700.0f, -4000.0f)); // the view we are alligned too
-		projection = glm::perspective(glm::radians(45.0f), (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 7000.0f); // the Max and Min we set to be able to see
+		projection = glm::perspective(glm::radians(45.0f), (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 7000.0f);
 
-		// Get their uniform location
 		GLint viewLoc = glGetUniformLocation(shaderProgram, "view");
 		GLint projLoc = glGetUniformLocation(shaderProgram, "projection");
 
-		// Pass the matrices to the shader
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-		// Note: currently we set the projection matrix each frame, but since the projection matrix rarely changes it's often best practice to set it outside the main loop only once.
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 		// ================
@@ -414,24 +437,33 @@ int main()
 		colorGreen = 1.0f;
 		glUniform4f(vertexColorLocation, colorRed, colorGreen, colorBlue, 1.0f);
 
-		// ===============================
-		// --- Spawning the triangles ---
-		// ===============================
-		glBindVertexArray(VAOs[2]);
-		DeathMap();
+		// ==============================
+		// --- Spawning the HeatMaps ---
+		// ==============================
+		switch (WhichHeatMap)
+		{
+		case 1:
+			glBindVertexArray(VAOs[1]);
+			HeatMap();	
+			break;
+		case 2:
+			glBindVertexArray(VAOs[2]);
+			DeathMap();
+			break;
+		default:
+			break;
+		}
 
-		//glBindVertexArray(VAOs[1]);
-		//HeatMap();
-		////glDrawArrays(GL_TRIANGLES, 0, 6); // --- Default ---
-
-		//glBindVertexArray(VAOs[0]);
-		//Trajection();
-		//glDrawArrays(GL_TRIANGLES, 0, 3); // --- Default ---
+		// ==============================
+		// --- Spawning the Trajectories ---
+		// ==============================
+		glBindVertexArray(VAOs[0]);
+		Trajection();
 		
 		glBindVertexArray(0);
-		
 		glfwSwapBuffers(window);
 	}
+
 	// ========================
 	// --- Deletes the VAO ---
 	// ========================
@@ -445,7 +477,6 @@ int main()
 	return 0;
 }
 
-// --- User Input Function ---
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
 	// When a user presses the escape key, we set the WindowShouldClose property to true, closing the application
@@ -511,57 +542,215 @@ void switchPlayer()
 	if (keys[GLFW_KEY_3])
 	{
 		WhichTrajectory = -1;
-		cout << "Trajectories Off" << endl;
+		cout << "Trajectories Off!" << endl;
 	}
 
-}
-
-void CheckWithin(glm::vec3 Square[], glm::vec3 PlayerPos[], int ColourArray[])
-{
-		int ColorNum = 0;
-		for (int i = 0; i < ColorArray; i++)
-		{
-			for (int j = 0; j < PosArray; j++)
-			{
-				if ((PlayerPos[j].x != 0) && (PlayerPos[j].y != 0))
-				{
-					if ((PlayerPos[j].x < (Square[i].x + 5)) && (PlayerPos[j].x >(Square[i].x - 5)) && (PlayerPos[j].y < (Square[i].y + 5)) && (PlayerPos[j].y >(Square[i].y - 5)))
-					{
-						ColorNum++;
-					}
-				}
-			}
-			ColourArray[i] = ColorNum;
-			if (ColourArray[i] < 0)
-			{
-				ColourArray[i] = 0;
-			}
-			ColorNum = 0;
-		}
-}
-
-void CheckDeath(glm::vec3 Square[], glm::vec3 PlayerPos[], int ColourArray[])
-{
-	int ColorNum = 0;
-	for (int i = 0; i < DeathArray; i++)
+	if (keys[GLFW_KEY_4])
 	{
-		for (int j = 0; j < PosArray; j++)
+		WhichHeatMap = 1;
+		if (WhichHeatMap > -1 && WhichHeatMap < 11)
 		{
-			if ((PlayerPos[j].x != 0) && (PlayerPos[j].y != 0))
+			cout << "Player Position Heat Map!" << endl;
+		}
+	}
+
+	if (keys[GLFW_KEY_5])
+	{
+		WhichHeatMap = 2;
+		if (WhichHeatMap > -1 && WhichHeatMap < 11)
+		{
+			cout << "Player Deaths Heat Map!" << endl;
+		}
+	}
+
+	if (keys[GLFW_KEY_6])
+	{
+		WhichHeatMap = 0;
+		cout << "Heat Maps Off!" << endl;
+	}
+	if (keys[GLFW_KEY_MINUS])
+	{
+		WhichTrajectory = -1;
+		allTrajectories = 1;
+		cout << "Full Player Trajectories On!";
+	}
+	if (keys[GLFW_KEY_EQUAL])
+	{
+		WhichTrajectory = -1;
+		allTrajectories = 0;
+		cout << "Full Player Trajectories Off!";
+	}
+}
+
+void Trajection()
+{
+	switch (allTrajectories)
+	{
+	case 1:
+		for (GLuint i = 0; i < PosArray; i++)
+		{
+			if (playerPosFull[i].x != 0 && playerPosFull[i].y != 0)
 			{
-				if ((PlayerPos[j].x < (Square[i].x + 12.5)) && (PlayerPos[j].x >(Square[i].x - 12.5)) && (PlayerPos[j].y < (Square[i].y + 12.5)) && (PlayerPos[j].y >(Square[i].y - 12.5)))
-				{
-					ColorNum++;
-				}
+				glUniform4f(vertexColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
+				glm::mat4 trans;
+				trans = glm::translate(trans, playerPosFull[i]);
+				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
 		}
-		cout << ColorNum << endl;
-		ColourArray[i] = ColorNum;
-		if (ColourArray[i] < 0)
+		break;
+	default:
+		glUniform4f(vertexColorLocation, 0.0f, 0.0f, 0.0f, 0.0f);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		break;
+	}
+	switch (WhichTrajectory)
+	{
+	case 0:
+		for (GLuint i = 0; i < PosArray; i++)
 		{
-			ColourArray[i] = 0;
+			if (playerPos0[i].x != 0 && playerPos0[i].y != 0)
+			{
+				glUniform4f(vertexColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
+				glm::mat4 trans;
+				trans = glm::translate(trans, playerPos0[i]);
+				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
 		}
-		ColorNum = 0;
+		break;
+	case 1:
+		for (GLuint i = 0; i < PosArray; i++)
+		{
+			if (playerPos1[i].x != 0 && playerPos1[i].y != 0)
+			{
+				glUniform4f(vertexColorLocation, 0.0f, 1.0f, 0.0f, 1.0f);
+				glm::mat4 trans;
+				trans = glm::translate(trans, playerPos1[i]);
+				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
+		}
+		break;
+	case 2:
+		for (GLuint i = 0; i < PosArray; i++)
+		{
+			if (playerPos2[i].x != 0 && playerPos2[i].y != 0)
+			{
+				glUniform4f(vertexColorLocation, 1.0f, 1.0f, 0.0f, 1.0f);
+				glm::mat4 trans;
+				trans = glm::translate(trans, playerPos2[i]);
+				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
+		}
+		break;
+	case 3:
+		for (GLuint i = 0; i < PosArray; i++)
+		{
+			if (playerPos3[i].x != 0 && playerPos3[i].y != 0)
+			{
+				glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+				glm::mat4 trans;
+				trans = glm::translate(trans, playerPos3[i]);
+				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
+		}
+		break;
+	case 4:
+		for (GLuint i = 0; i < PosArray; i++)
+		{
+			if (playerPos4[i].x != 0 && playerPos4[i].y != 0)
+			{
+				glUniform4f(vertexColorLocation, 1.0f, 0.0f, 1.0f, 1.0f);
+				glm::mat4 trans;
+				trans = glm::translate(trans, playerPos4[i]);
+				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
+		}
+		break;
+	case 5:
+		for (GLuint i = 0; i < PosArray; i++)
+		{
+			if (playerPos5[i].x != 0 && playerPos5[i].y != 0)
+			{
+				glUniform4f(vertexColorLocation, 1.0f, 1.0f, 0.5f, 1.0f);
+				glm::mat4 trans;
+				trans = glm::translate(trans, playerPos5[i]);
+				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
+		}
+		break;
+	case 6:
+		for (GLuint i = 0; i < PosArray; i++)
+		{
+			if (playerPos6[i].x != 0 && playerPos6[i].y != 0)
+			{
+				glUniform4f(vertexColorLocation, 1.0f, 0.5f, 0.0f, 1.0f);
+				glm::mat4 trans;
+				trans = glm::translate(trans, playerPos6[i]);
+				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
+		}
+		break;
+	case 7:
+		for (GLuint i = 0; i < PosArray; i++)
+		{
+			if (playerPos7[i].x != 0 && playerPos7[i].y != 0)
+			{
+				glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+				glm::mat4 trans;
+				trans = glm::translate(trans, playerPos7[i]);
+				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
+		}
+		break;
+	case 8:
+		for (GLuint i = 0; i < PosArray; i++)
+		{
+			if (playerPos8[i].x != 0 && playerPos8[i].y != 0)
+			{
+				glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+				glm::mat4 trans;
+				trans = glm::translate(trans, playerPos8[i]);
+				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
+		}
+		break;
+	case 9:
+		for (GLuint i = 0; i < PosArray; i++)
+		{
+			if (playerPos9[i].x != 0 && playerPos9[i].y != 0)
+			{
+				glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
+				glm::mat4 trans;
+				trans = glm::translate(trans, playerPos9[i]);
+				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+			}
+		}
+		break;
+	default:
+		glUniform4f(vertexColorLocation, 0.0f, 0.0f, 0.0f, 0.0f);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		break;
 	}
 }
 
@@ -604,6 +793,54 @@ void CreateDeathArray(glm::vec3 SquaresArrayTwo[])
 		}
 	}
 	k = 0;
+}
+
+void CheckWithin(glm::vec3 Square[], glm::vec3 PlayerPos[], int ColourArray[])
+{
+		int ColorNum = 0;
+		for (int i = 0; i < ColorArray; i++)
+		{
+			for (int j = 0; j < PosArray; j++)
+			{
+				if ((PlayerPos[j].x != 0) && (PlayerPos[j].y != 0))
+				{
+					if ((PlayerPos[j].x < (Square[i].x + 5)) && (PlayerPos[j].x >(Square[i].x - 5)) && (PlayerPos[j].y < (Square[i].y + 5)) && (PlayerPos[j].y >(Square[i].y - 5)))
+					{
+						ColorNum++;
+					}
+				}
+			}
+			ColourArray[i] = ColorNum;
+			if (ColourArray[i] < 0)
+			{
+				ColourArray[i] = 0;
+			}
+			ColorNum = 0;
+		}
+}
+
+void CheckDeath(glm::vec3 Square[], glm::vec3 PlayerPos[], int ColourArray[])
+{
+	int ColorNum = 0;
+	for (int i = 0; i < DeathArray; i++)
+	{
+		for (int j = 0; j < PosArray; j++)
+		{
+			if ((PlayerPos[j].x != 0) && (PlayerPos[j].y != 0))
+			{
+				if ((PlayerPos[j].x < (Square[i].x + 12.5)) && (PlayerPos[j].x >(Square[i].x - 12.5)) && (PlayerPos[j].y < (Square[i].y + 12.5)) && (PlayerPos[j].y >(Square[i].y - 12.5)))
+				{
+					ColorNum++;
+				}
+			}
+		}
+		ColourArray[i] = ColorNum;
+		if (ColourArray[i] < 0)
+		{
+			ColourArray[i] = 0;
+		}
+		ColorNum = 0;
+	}
 }
 
 void colourpicker(int noOfInts)
@@ -958,73 +1195,6 @@ void deathcolourpicker(int noOfIntsTwo)
 		colorRed = 1.0f;
 		colorGreen = 0.0f;
 		colorBlue = 0.0f;
-	}
-}
-
-void Trajection()
-{
-	switch (WhichTrajectory)
-	{
-	case 0:
-		for (GLuint i = 0; i < PosArray; i++)
-		{
-			if (playerPos0[i].x != 0 && playerPos0[i].y != 0)
-			{
-				glUniform4f(vertexColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
-				glm::mat4 trans;
-				trans = glm::translate(trans, playerPos0[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
-				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-				glDrawArrays(GL_TRIANGLES, 0, 6);
-			}
-		}
-		break;
-	case 1:
-		for (GLuint i = 0; i < PosArray; i++)
-		{
-			if (playerPos1[i].x != 0 && playerPos1[i].y != 0)
-			{
-				glUniform4f(vertexColorLocation, 0.0f, 1.0f, 0.0f, 1.0f);
-				glm::mat4 trans;
-				trans = glm::translate(trans, playerPos1[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
-				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-				glDrawArrays(GL_TRIANGLES, 0, 6);
-			}
-		}
-		break;
-	case 2:
-		for (GLuint i = 0; i < PosArray; i++)
-		{
-			if (playerPos2[i].x != 0 && playerPos2[i].y != 0)
-			{
-				glUniform4f(vertexColorLocation, 1.0f, 1.0f, 0.0f, 1.0f);
-				glm::mat4 trans;
-				trans = glm::translate(trans, playerPos2[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
-				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-				glDrawArrays(GL_TRIANGLES, 0, 6);
-			}
-		}
-		break;
-	case 3:
-		for (GLuint i = 0; i < PosArray; i++)
-		{
-			if (playerPos3[i].x != 0 && playerPos3[i].y != 0)
-			{
-				glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
-				glm::mat4 trans;
-				trans = glm::translate(trans, playerPos3[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
-				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-				glDrawArrays(GL_TRIANGLES, 0, 6);
-			}
-		}
-		break;
-	default:
-		glUniform4f(vertexColorLocation, 0.0f, 0.0f, 0.0f, 0.0f);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
-		break;
 	}
 }
 
