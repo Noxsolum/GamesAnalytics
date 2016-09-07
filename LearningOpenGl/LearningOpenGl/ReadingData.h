@@ -4,9 +4,9 @@
 #include <sstream>
 
 #define GLEW_STATIC
-#include <Cunt\glew.h>
+#include <GLFW\glew.h>
 // GLFW
-#include <Cunt\glfw3.h>
+#include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtc\type_ptr.hpp>

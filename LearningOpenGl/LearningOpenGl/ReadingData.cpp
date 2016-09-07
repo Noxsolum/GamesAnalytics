@@ -4,9 +4,9 @@
 #include <sstream>
 
 #define GLEW_STATIC
-#include <Cunt\glew.h>
+#include <GLFW\glew.h>
 // GLFW
-#include <Cunt\glfw3.h>
+#include <GLFW\glfw3.h>
 #include "ReadingData.h"
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
@@ -21,8 +21,8 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 	ifstream myLogFile;
 	string line;
 	//myLogFile.open("C:\\Users\\Computing\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading1.txt");
-	myLogFile.open("C:\\Users\\Computing\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading2.txt");
-	//myLogFile.open("C:\\Users\\Computing\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading3.txt");
+	myLogFile.open("..\\DataForReading2.txt");
+	//myLogFile.open("C:\\Users\\\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading3.txt");
 	int MaxNum = 0;
 
 	cout << "Begins Reading Data!" << endl;
