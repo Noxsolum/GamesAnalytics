@@ -10,26 +10,37 @@
 
 // GLFW
 #include <GLFW\glfw3.h>
-#include "ReadingData.h"
+
+// GLM
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtc\type_ptr.hpp>
 #include <glm\ext.hpp>
 #include <glm\gtx\string_cast.hpp>
 
+// FreeType
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
+// Other Headers
+#include "ReadingAndAnalyzing.h"
+#include "ShaderHeader.h"
+
 using namespace std;
+using namespace glm;
+
 
 // ========================
 // --- Shader Creation ---
 // ========================
-GLuint VBOs[3], VAOs[3];
-GLuint shaderProgram;
+GLuint VAOTraj, VAOpPos, VAOdPos, VAOtext;
+GLuint VBOTraj, VBOpPos, VBOdPos, VBOtext;
 GLint vertexColorLocation;
 
 // ==========================
 // --- Window Dimensions ---
 // ==========================
-const GLuint WIDTH = 900, HEIGHT = 900;
+const GLuint WIDTH = 1250, HEIGHT = 900;
 
 // =======================
 // --- Input Function ---
@@ -41,7 +52,7 @@ void switchPlayer();
 // ===============
 // --- Camera ---
 // ===============
-glm::vec3 cameraPos = glm::vec3(415.0f, 754.0f, 2526.0f);
+glm::vec3 cameraPos = glm::vec3(410.0f, 754.0f, 2526.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 glm::vec3 cameraRight = glm::vec3(1.0f, 0.0f, 0.0f);
@@ -50,8 +61,8 @@ bool keys[1024];
 // ==================
 // --- Deltatime ---
 // ==================
-GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
-GLfloat lastFrame = 0.0f;  	// Time of last frame
+GLfloat deltaTime = 0.0f;
+GLfloat lastFrame = 0.0f;
 
 // ================
 // --- HeatMap ---
@@ -66,12 +77,26 @@ void deathcolourpicker(int noOfIntTwo);
 // =================
 // --- Creation ---
 // =================
-void Trajection();
-void HeatMap();
-void DeathMap();
+void Trajection(Shader shaderProg);
+void HeatMap(Shader ShaderProg);
+void DeathMap(Shader ShaderProg);
+
+// =================
+// --- Freetype ---
+// =================
+void RenderText(Shader &ShaderProg, string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color);
+
+struct Character {
+	GLuint TextureID; 
+	glm::ivec2 Size; 
+	glm::ivec2 Bearing; 
+	GLuint Advance; 
+};
+
+map<GLchar, Character> Characters;
 
 // =========================
-// --- Player Variables ---
+// --- Misc Variables ---
 // =========================
 const int ColorArray = 60000;
 const int DeathArray = 8100;
@@ -95,6 +120,7 @@ glm::vec3 playerPosDeath[PosArray];
 int WhichTrajectory = 0;
 int WhichHeatMap = 0;
 int allTrajectories = 0;
+bool instrucToggle = true;
 
 // ================
 // --- Colours ---
@@ -103,104 +129,15 @@ GLfloat colorBlue = 0.0f;
 GLfloat colorRed = 0.0f;
 GLfloat colorGreen = 0.0f;
 
-/* --- GLSL Shaders ---
-- THe shaders are, very simply, nothing more than programs that transform inputs to outputs -
-- We use GLSL for this because it is specifically tailored to vector and matrix manipulation -
-
--- A Shader always begins with the version declaration --
-#version version_number
-
--- Followed by the Inputs, Outputs and Uniforms --
-in type in_varible_name;
-in type in_varible_name;
-
-out type out_varible_name;
-out type out_varible_name;
-
-uniform type uniform_name;
-
--- Followed by it's main function where we process all of the input varibles and output them in the output varibles --
-void main()
-{
-// Process the inputs and do weird graphics stuff
-...
-//Output the processed stuff to output variable
-output_variable_name = weird_stuff_we_processed;
-}
-
---- Types ---
-- GLSL has all the basic types we know (int, float, double, uint, bool) -
-- It also introduces two container types which are vectors and matrices -
-
---- Vectors ---
-- vecn: Default number of n floats
-- bvecn: a vector of n booleans.
-- ivecn: a vector of n integers.
-- uvecn: a vector of n unsigned integers.
-- dvecn: a vector of n double components.
-
-- To access the individual componants of these vecs we will use .x, .y, .z and .w
-- e.g. vec3 someVec;
-- e.g. someVec.x;
-- e.g. someVec = (1.0f, 1.0f, 1.0f)
-- e.g. vec4 otherVec = (someVec.xyz, 1.0f)
-
-- GLSL uses the keyword 'in' and 'out' to move things about within the shaders
-*/
-// ======================
-// --- Vertex Shader ---
-// ======================
-const GLchar* vertexShaderSource = "#version 330 core\n"
-
-"layout (location = 0) in vec3 position;\n"
-
-"out vec4 vertexColor;\n"
-
-"uniform mat4 transform;\n"
-"uniform mat4 view;\n"
-"uniform mat4 projection;\n"
-
-"void main()\n"
-"{\n"
-"gl_Position = projection * view * transform * vec4(position, 1.0f);\n"
-"}\n";
-
-// ========================
-// --- Fragment Shader ---
-// ========================
-const GLchar* fragmentShaderSource = "#version 330 core\n"
-
-"out vec4 color;\n"
-
-"uniform vec4 ourColor;\n"
-
-"void main()\n"
-"{\n"
-
-"color = ourColor;\n"
-
-"}\n\0";
-
-
 int main()
 {
-	// =====================
-	// --- Instructions ---
-	// =====================
-	cout << "Start Program!\n";
-	cout << "Use the WASD keys to pan the scene!\n";
-	cout << "Use Page Up and Page Down to Zoom!\n";
-	cout << "Use the '1', '2' and '3' keys to change the the individual trajectories!\n";
-	cout << "Use the '4', '5' and '6' keys to change the the heat maps!\n";
-	cout << "Use the '-' and '=' keys to turn on and off the full trajectories!\n";
-
 	// =====================
 	// --- Reading Data ---
 	// =====================
 	CreateSquareArray(HeatMapSquares);
 	CreateDeathArray(DeathMapSquares);
-	
-	ReadingData(playerPos0, playerPos1, playerPos2, playerPos3, playerPos4, playerPos5, playerPos6, playerPos7, playerPos8, playerPos9, playerPosFull);
+
+	ReadingPositions(playerPos0, playerPos1, playerPos2, playerPos3, playerPos4, playerPos5, playerPos6, playerPos7, playerPos8, playerPos9, playerPosFull);
 	ReadingDeath(playerPosDeath);
 
 	CheckWithin(HeatMapSquares, playerPosFull, ColorPickerFull);
@@ -224,7 +161,7 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "LearnOpenGL", nullptr, nullptr); // --- Width - Height - Title - Window? - Unknown ---
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "HeatMapping", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 	if (window == NULL)
 	{
@@ -236,12 +173,89 @@ int main()
 	// ========================
 	// --- INITIALIZE GLEW ---
 	//=========================
-	glewExperimental = GL_TRUE; // - Activates Modern Versions of GLEW
+	glewExperimental = GL_TRUE;
+	glewInit();
+
 	if (glewInit() != GLEW_OK)
 	{
 		std::cout << "Failed to initialize GLEW" << std::endl;
 		return -1;
 	}
+
+	// ========================
+	// --- Getting Shaders ---
+	// ========================
+	Shader defaultShader("C:\\Users\\Daniel\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\Shader Files\\VertexShaderDefault.txt", "C:\\Users\\Daniel\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\Shader Files\\FragmentShaderDefault.txt");
+
+	Shader textShader("C:\\Users\\Daniel\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\Shader Files\\VertexShaderText.txt", "C:\\Users\\Daniel\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\Shader Files\\FragmentShaderText.txt");
+
+	mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(WIDTH), 0.0f, static_cast<GLfloat>(HEIGHT));
+	textShader.Use();
+	glUniformMatrix4fv(glGetUniformLocation(textShader.shaderProgram, "projection"), 1, GL_FALSE, value_ptr(projection));
+
+	// ===================================
+	// --- INITIALIZE FREETYPE & FONT ---
+	// ===================================
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	FT_Library ft;
+	if (FT_Init_FreeType(&ft))
+	{
+		cout << "ERROR::FREETYPE: Could not init FreeType Library" << endl;
+	}
+
+	FT_Face face;
+	if (FT_New_Face(ft, "C:\\Windows\\Fonts\\arial.ttf", 0, &face))
+	{
+		cout << "ERROR::FREETYPE: Failed to load font" << endl;
+	}
+
+	FT_Set_Pixel_Sizes(face, 0, 48);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+	for (GLubyte c = 0; c < 128; c++)
+	{
+		if (FT_Load_Char(face, c, FT_LOAD_RENDER))
+		{
+			std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+			continue;
+		}
+
+		GLuint texture;
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		glTexImage2D(
+			GL_TEXTURE_2D,
+			0,
+			GL_RED,
+			face->glyph->bitmap.width,
+			face->glyph->bitmap.rows,
+			0,
+			GL_RED,
+			GL_UNSIGNED_BYTE,
+			face->glyph->bitmap.buffer
+			);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		Character character = {
+			texture,
+			glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
+			glm::ivec2(face->glyph->bitmap_left, face->glyph->bitmap_top),
+			face->glyph->advance.x
+		};
+		Characters.insert(std::pair<GLchar, Character>(c, character));
+	}
+
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	FT_Done_Face(face);
+	FT_Done_FreeType(ft);
 
 	// ======================================
 	// --- Call The KeyCallBack Function ---
@@ -252,67 +266,6 @@ int main()
 	// --- Initialize the Viewport (Camera) ---
 	// =========================================
 	glViewport(0, 0, WIDTH, HEIGHT);
-
-	// ======================
-	// --- Vertex Shader ---
-	// ======================
-
-	GLuint vertexShader; // - Creates the shader object -
-	vertexShader = glCreateShader(GL_VERTEX_SHADER); // - Defines what kind of shader we want -
-
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL); // - The shader object, How many strings we want to pass, The source code(GLSL), length of the array - 
-	glCompileShader(vertexShader); // - Compiles the shader -
-
-								   // --- Testing to see if the vertex shader properly compiled ---
-	GLint success;
-	GLchar infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << endl;
-	}
-
-	// ========================
-	// --- Fragment Shader ---
-	// ========================
-
-	GLuint fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-
-	// --- Testing to see if the fragment shader properly compiles ---
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << endl;
-	}
-
-	// ========================
-	// --- Program Shaders ---
-	// ========================
-	shaderProgram = glCreateProgram();
-
-	glAttachShader(shaderProgram, vertexShader);
-	glAttachShader(shaderProgram, fragmentShader);
-	glLinkProgram(shaderProgram);
-
-	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << endl;
-	}
-
-	// ==================================================
-	// --- Delete the shaders once they are finished ---
-	// ==================================================
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);
 
 	// =====================
 	// --- VERTEX INPUT ---
@@ -326,7 +279,7 @@ int main()
 		-3.0f, 3.0f, 0.0f,
 		3.0f, 3.0f, 0.0f,
 	};
-	
+
 	GLfloat SquareForHeatMap[] = {
 		-5.0f, -5.0f, 0.0f,
 		5.0f, -5.0f, 0.0f,
@@ -350,24 +303,30 @@ int main()
 	// =================================
 	// --- Setting Up The Triangles ---
 	// =================================
-	glGenVertexArrays(3, VAOs);
-	glGenBuffers(3, VBOs);
+	glGenVertexArrays(1, &VAOTraj);
+	glGenBuffers(1, &VBOTraj);
+	glGenVertexArrays(1, &VAOpPos);
+	glGenBuffers(1, &VBOpPos);
+	glGenVertexArrays(1, &VAOdPos);
+	glGenBuffers(1, &VBOdPos);
+	glGenVertexArrays(1, &VAOtext);
+	glGenBuffers(1, &VBOtext);
 
 	// ============================
 	// --- Trajectory Squares ---
 	// ============================
-	glBindVertexArray(VAOs[0]);
-	glBindBuffer(GL_ARRAY_BUFFER, VBOs[0]);
+	glBindVertexArray(VAOTraj);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOTraj);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(SquareForTrajectory), SquareForTrajectory, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
-	glBindVertexArray(0); 
+	glBindVertexArray(0);
 
 	// ======================================
 	// --- HeatMap Squares For Positions ---
 	// ======================================
-	glBindVertexArray(VAOs[1]);
-	glBindBuffer(GL_ARRAY_BUFFER, VBOs[1]);
+	glBindVertexArray(VAOpPos);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOpPos);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(SquareForHeatMap), SquareForHeatMap, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
@@ -376,11 +335,22 @@ int main()
 	// ===================================
 	// --- HeatMap Squares For Deaths ---
 	// ===================================
-	glBindVertexArray(VAOs[2]);
-	glBindBuffer(GL_ARRAY_BUFFER, VBOs[2]);
+	glBindVertexArray(VAOdPos);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOdPos);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(SquareForDeathMap), SquareForDeathMap, GL_STATIC_DRAW);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
 	glEnableVertexAttribArray(0);
+	glBindVertexArray(0);
+
+	// =================
+	// --- Freetype ---
+	//==================
+	glBindVertexArray(VAOtext);
+	glBindBuffer(GL_ARRAY_BUFFER, VBOtext);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat) * 6 * 4, NULL, GL_DYNAMIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
 	// ======================
@@ -409,9 +379,11 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		// --- Drawing Our First Triangle ---
-		glUseProgram(shaderProgram);
-
+		// ============================
+		// --- Getting Our Shaders ---
+		// ============================
+		defaultShader.Use();
+		
 		// ===============
 		// --- Camera ---
 		// ===============
@@ -422,8 +394,8 @@ int main()
 		glm::mat4 projection;
 		projection = glm::perspective(glm::radians(45.0f), (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 7000.0f);
 
-		GLint viewLoc = glGetUniformLocation(shaderProgram, "view");
-		GLint projLoc = glGetUniformLocation(shaderProgram, "projection");
+		GLint viewLoc = glGetUniformLocation(defaultShader.shaderProgram, "view");
+		GLint projLoc = glGetUniformLocation(defaultShader.shaderProgram, "projection");
 
 		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
@@ -431,7 +403,7 @@ int main()
 		// ================
 		// --- Colours ---
 		// ================
-		vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor"); // gets the uniforms location
+		vertexColorLocation = glGetUniformLocation(defaultShader.shaderProgram, "ourColor");
 		colorRed = 1.0f;
 		colorBlue = 0.0f;
 		colorGreen = 1.0f;
@@ -443,12 +415,14 @@ int main()
 		switch (WhichHeatMap)
 		{
 		case 1:
-			glBindVertexArray(VAOs[1]);
-			HeatMap();	
+			glBindVertexArray(VAOpPos);
+			glBindBuffer(GL_ARRAY_BUFFER, VAOpPos);
+			HeatMap(defaultShader);	
 			break;
 		case 2:
-			glBindVertexArray(VAOs[2]);
-			DeathMap();
+			glBindVertexArray(VAOdPos);
+			glBindBuffer(GL_ARRAY_BUFFER, VAOdPos);
+			DeathMap(defaultShader);
 			break;
 		default:
 			break;
@@ -457,18 +431,47 @@ int main()
 		// ==============================
 		// --- Spawning the Trajectories ---
 		// ==============================
-		glBindVertexArray(VAOs[0]);
-		Trajection();
-		
+		glBindVertexArray(VAOTraj);
+		glBindBuffer(GL_ARRAY_BUFFER, VBOTraj);
+		Trajection(defaultShader);
+
+		// =================
+		// --- FreeType ---
+		// =================
+		textShader.Use(); // - Initializing FreeType
+
+		// - Instructions
+		if (instrucToggle == true)
+		{
+			RenderText(textShader, "Press the WASD keys to pan the scene!", 5.0f, 880.0f, 0.4f, glm::vec3(1.0, 1.0f, 1.0f));
+			RenderText(textShader, "Use the PageUp and PageDown to Zoom!", 5.0f, 855.0f, 0.4f, glm::vec3(1.0, 1.0f, 1.0f));
+			RenderText(textShader, "Press the '1', '2' and '3' keys to change", 5.0f, 830.0f, 0.4f, glm::vec3(1.0, 1.0f, 1.0f));
+			RenderText(textShader, "the the individual trajectories!", 15.0f, 805.5f, 0.4f, glm::vec3(1.0, 1.0f, 1.0f));
+			RenderText(textShader, "Pess the '4', '5' and '6' keys to ", 5.0f, 780.0f, 0.4f, glm::vec3(1.0, 1.0f, 1.0f));
+			RenderText(textShader, "change the the heat maps!", 15.0f, 755.0f, 0.4f, glm::vec3(1.0, 1.0f, 1.0f));
+			RenderText(textShader, "Press the '-' and '=' keys to turn on", 5.0f, 730.0f, 0.4f, glm::vec3(1.0, 1.0f, 1.0f));
+			RenderText(textShader, "and off the full trajectories!", 15.0f, 705.0f, 0.4f, glm::vec3(1.0, 1.0f, 1.0f));
+			RenderText(textShader, "Press Space to toggle Instructions", 5.0f, 660.0f, 0.4f, glm::vec3(1.0, 1.0f, 1.0f));
+		}
+
+		// ============================================
+		// --- Swapping the Back and Front Buffers ---
+		// ============================================
 		glBindVertexArray(0);
 		glfwSwapBuffers(window);
 	}
 
 	// ========================
 	// --- Deletes the VAO ---
-	// ========================
-	glDeleteVertexArrays(2, VAOs);
-	glDeleteBuffers(2, VBOs);
+	// ========================	
+	glDeleteVertexArrays(1, &VAOTraj);
+	glDeleteBuffers(1, &VBOTraj);
+	glDeleteVertexArrays(1, &VAOpPos);
+	glDeleteBuffers(1, &VBOpPos);
+	glDeleteVertexArrays(1, &VAOdPos);
+	glDeleteBuffers(1, &VBOdPos);
+	glDeleteVertexArrays(1, &VAOtext);
+	glDeleteBuffers(1, &VBOtext);
 
 	// =================
 	// --- End Main --- 
@@ -477,6 +480,53 @@ int main()
 	return 0;
 }
 
+// ====================================
+// --- Function for Rendering Text ---
+// ====================================
+void RenderText(Shader &ShaderProg, string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color)
+{
+	ShaderProg.Use();
+	glUniform3f(glGetUniformLocation(ShaderProg.shaderProgram, "textColor"), color.x, color.y, color.z);
+	glActiveTexture(GL_TEXTURE0);
+	glBindVertexArray(VAOtext);
+
+	string::const_iterator c;
+
+	for (c = text.begin(); c != text.end(); c++)
+	{
+		Character ch = Characters[*c];
+
+		GLfloat xpos = x + ch.Bearing.x * scale;
+		GLfloat ypos = y - (ch.Size.y - ch.Bearing.y) * scale;
+
+		GLfloat w = ch.Size.x * scale;
+		GLfloat h = ch.Size.y * scale;
+
+		GLfloat vertices[6][4] = {
+			{ xpos,     ypos + h,   0.0, 0.0 },
+			{ xpos,     ypos,       0.0, 1.0 },
+			{ xpos + w, ypos,       1.0, 1.0 },
+
+			{ xpos,     ypos + h,   0.0, 0.0 },
+			{ xpos + w, ypos,       1.0, 1.0 },
+			{ xpos + w, ypos + h,   1.0, 0.0 }
+		};
+		
+		glBindTexture(GL_TEXTURE_2D, ch.TextureID);
+		glBindBuffer(GL_ARRAY_BUFFER, VBOtext);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+		
+		x += (ch.Advance >> 6) * scale;
+	}
+	glBindVertexArray(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+// =============================================
+// --- Function for Allowing Keyboard Input ---
+// =============================================
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
 	// When a user presses the escape key, we set the WindowShouldClose property to true, closing the application
@@ -491,6 +541,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 }
 
+// ==========================================================
+// --- Function for Moving the Camera using the Keyboard ---
+// ==========================================================
 void do_movement()
 {
 	// Camera controls
@@ -513,8 +566,22 @@ void do_movement()
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	if (keys[GLFW_KEY_D])
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (keys[GLFW_KEY_SPACE])
+	{
+		if (instrucToggle == true)
+		{
+			instrucToggle = false;
+		}
+		else
+		{
+			instrucToggle = true;
+		}
+	}
 }
 
+// ===========================================================
+// --- Function for Switching Between Player Trajectories ---
+// ===========================================================
 void switchPlayer()
 {
 	if (WhichTrajectory < 10)
@@ -582,7 +649,10 @@ void switchPlayer()
 	}
 }
 
-void Trajection()
+// =============================================================
+// --- Function for Rendering Different Player Trajectories ---
+// =============================================================
+void Trajection(Shader ShaderProg)
 {
 	switch (allTrajectories)
 	{
@@ -594,7 +664,7 @@ void Trajection()
 				glUniform4f(vertexColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPosFull[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				GLuint transformLoc = glGetUniformLocation(ShaderProg.shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
@@ -615,7 +685,7 @@ void Trajection()
 				glUniform4f(vertexColorLocation, 1.0f, 1.0f, 1.0f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPos0[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				GLuint transformLoc = glGetUniformLocation(ShaderProg.shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
@@ -629,7 +699,7 @@ void Trajection()
 				glUniform4f(vertexColorLocation, 0.0f, 1.0f, 0.0f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPos1[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				GLuint transformLoc = glGetUniformLocation(ShaderProg.shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
@@ -643,7 +713,7 @@ void Trajection()
 				glUniform4f(vertexColorLocation, 1.0f, 1.0f, 0.0f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPos2[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				GLuint transformLoc = glGetUniformLocation(ShaderProg.shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
@@ -657,7 +727,7 @@ void Trajection()
 				glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPos3[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				GLuint transformLoc = glGetUniformLocation(ShaderProg.shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
@@ -671,7 +741,7 @@ void Trajection()
 				glUniform4f(vertexColorLocation, 1.0f, 0.0f, 1.0f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPos4[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				GLuint transformLoc = glGetUniformLocation(ShaderProg.shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
@@ -685,7 +755,7 @@ void Trajection()
 				glUniform4f(vertexColorLocation, 1.0f, 1.0f, 0.5f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPos5[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				GLuint transformLoc = glGetUniformLocation(ShaderProg.shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
@@ -699,7 +769,7 @@ void Trajection()
 				glUniform4f(vertexColorLocation, 1.0f, 0.5f, 0.0f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPos6[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				GLuint transformLoc = glGetUniformLocation(ShaderProg.shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
@@ -713,7 +783,7 @@ void Trajection()
 				glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPos7[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				GLuint transformLoc = glGetUniformLocation(ShaderProg.shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
@@ -727,7 +797,7 @@ void Trajection()
 				glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPos8[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				GLuint transformLoc = glGetUniformLocation(ShaderProg.shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
@@ -741,7 +811,7 @@ void Trajection()
 				glUniform4f(vertexColorLocation, 1.0f, 0.0f, 0.0f, 1.0f);
 				glm::mat4 trans;
 				trans = glm::translate(trans, playerPos9[i]);
-				GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+				GLuint transformLoc = glGetUniformLocation(ShaderProg.shaderProgram, "transform");
 				glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 				glDrawArrays(GL_TRIANGLES, 0, 6);
 			}
@@ -754,6 +824,9 @@ void Trajection()
 	}
 }
 
+// ==========================================================================
+// --- Function to Create a Square of Squares for the HeatMap (Position) ---
+// ==========================================================================
 void CreateSquareArray(glm::vec3 SquaresArray[])
 {
 	//Spawn squares every 10 points along the coords
@@ -776,6 +849,9 @@ void CreateSquareArray(glm::vec3 SquaresArray[])
 		k = 0;
 }
 
+// ========================================================================
+// --- Function to Create a Square of Squares for the HeatMap (Deaths) ---
+// ========================================================================
 void CreateDeathArray(glm::vec3 SquaresArrayTwo[])
 {
 	int k = 0;
@@ -795,6 +871,9 @@ void CreateDeathArray(glm::vec3 SquaresArrayTwo[])
 	k = 0;
 }
 
+// ====================================================================
+// --- Function to Check How many times a Player visits a Position ---
+// ====================================================================
 void CheckWithin(glm::vec3 Square[], glm::vec3 PlayerPos[], int ColourArray[])
 {
 		int ColorNum = 0;
@@ -819,6 +898,9 @@ void CheckWithin(glm::vec3 Square[], glm::vec3 PlayerPos[], int ColourArray[])
 		}
 }
 
+// ========================================================================
+// --- Function to Check How many times a Player dies on a Position ---
+// ========================================================================
 void CheckDeath(glm::vec3 Square[], glm::vec3 PlayerPos[], int ColourArray[])
 {
 	int ColorNum = 0;
@@ -843,6 +925,9 @@ void CheckDeath(glm::vec3 Square[], glm::vec3 PlayerPos[], int ColourArray[])
 	}
 }
 
+// =============================================================================
+// --- Changes the Colour of the Squares based on the Value of the Position ---
+// =============================================================================
 void colourpicker(int noOfInts)
 {
 	switch (noOfInts) {
@@ -1030,8 +1115,11 @@ void colourpicker(int noOfInts)
 		colorGreen = 0.0f;
 		colorBlue = 0.0f;
 	}
-}
+}      
 
+// ========================================================================
+// --- Changes the Colour of the Squares based on the Value of the Deaths ---
+// ========================================================================
 void deathcolourpicker(int noOfIntsTwo)
 {
 	if (noOfIntsTwo > -1 && noOfIntsTwo < 10)
@@ -1198,33 +1286,28 @@ void deathcolourpicker(int noOfIntsTwo)
 	}
 }
 
-void HeatMap()
+// ===========================================
+// --- Function for Rendering the HeatMap ---
+// ===========================================
+void HeatMap(Shader ShaderProg)
 {
 
-		for (GLuint i = 0; i < ColorArray; i++)
-		{
-			colourpicker(ColorPickerFull[i]);
-			glUniform4f(vertexColorLocation, colorRed, colorGreen, colorBlue, 1.0f);
-			glm::mat4 trans;
-			trans = glm::translate(trans, HeatMapSquares[i]);
-			GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
-			glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-		}
-
-		//for (GLuint i = 0; i < ColorArray; i++)
-		//{
-		//	colourpicker(ColorPickerDeath[i]);
-		//	glUniform4f(vertexColorLocation, colorRed, colorGreen, colorBlue, 1.0f);
-		//	glm::mat4 trans;
-		//	trans = glm::translate(trans, HeatMapSquares[i]);
-		//	GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
-		//	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-		//	glDrawArrays(GL_TRIANGLES, 0, 6);
-		//}
+	for (GLuint i = 0; i < ColorArray; i++)
+	{
+		colourpicker(ColorPickerFull[i]);
+		glUniform4f(vertexColorLocation, colorRed, colorGreen, colorBlue, 1.0f);
+		glm::mat4 trans;
+		trans = glm::translate(trans, HeatMapSquares[i]);
+		GLuint transformLoc = glGetUniformLocation(ShaderProg.shaderProgram, "transform");
+		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+	}
 }
 
-void DeathMap()
+// ========================================================================
+// --- Function for Rendering the Death HeatMap ---
+// ========================================================================
+void DeathMap(Shader ShaderProg)
 {
 	for (GLuint i = 0; i < DeathArray; i++)
 	{
@@ -1232,7 +1315,7 @@ void DeathMap()
 		glUniform4f(vertexColorLocation, colorRed, colorGreen, colorBlue, 1.0f);
 		glm::mat4 trans;
 		trans = glm::translate(trans, DeathMapSquares[i]);
-		GLuint transformLoc = glGetUniformLocation(shaderProgram, "transform");
+		GLuint transformLoc = glGetUniformLocation(ShaderProg.shaderProgram, "transform");
 		glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}

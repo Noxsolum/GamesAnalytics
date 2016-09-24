@@ -1,0 +1,109 @@
+﻿  autofit.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftbase.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+c:\users\daniel\desktop\freetype\freetype-2.7\src\base\ftrfork.c(827): warning C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\string.h(346): note: see declaration of 'strncpy'
+c:\users\daniel\desktop\freetype\freetype-2.7\src\base\ftrfork.c(839): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\string.h(90): note: see declaration of 'strcat'
+c:\users\daniel\desktop\freetype\freetype-2.7\src\base\ftrfork.c(840): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\string.h(90): note: see declaration of 'strcat'
+  ftbbox.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftbitmap.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftfntfmt.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftfstype.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftgasp.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftglyph.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftgxval.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftinit.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+..\..\..\src\base\ftinit.c(270): warning C4996: 'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdlib.h(1183): note: see declaration of 'getenv'
+  ftlcdfil.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftmm.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftotval.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftpatent.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftpfr.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftstroke.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftsynth.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftsystem.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+..\..\..\src\base\ftsystem.c(240): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdio.h(205): note: see declaration of 'fopen'
+  fttype1.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftwinfnt.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  Generating Code...
+c:\users\daniel\desktop\freetype\freetype-2.7\src\base\ftobjs.c(4794): warning C4702: unreachable code
+c:\users\daniel\desktop\freetype\freetype-2.7\src\base\ftobjs.c(4795): warning C4702: unreachable code
+  Compiling...
+  bdf.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+c:\users\daniel\desktop\freetype\freetype-2.7\src\bdf\bdflib.c(1793): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdio.h(1769): note: see declaration of 'sprintf'
+c:\users\daniel\desktop\freetype\freetype-2.7\src\bdf\bdflib.c(1806): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdio.h(1769): note: see declaration of 'sprintf'
+c:\users\daniel\desktop\freetype\freetype-2.7\src\bdf\bdflib.c(2135): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdio.h(1769): note: see declaration of 'sprintf'
+c:\users\daniel\desktop\freetype\freetype-2.7\src\bdf\bdflib.c(2143): warning C4996: 'sprintf': This function or variable may be unsafe. Consider using sprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdio.h(1769): note: see declaration of 'sprintf'
+  ftcache.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  cff.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  type1cid.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftgzip.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  ftlzw.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  pcf.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  pfr.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  psaux.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  pshinter.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  psmodule.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  raster.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  sfnt.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  smooth.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  truetype.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  type1.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  type42.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  winfnt.c
+C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stddef.h(1): warning C4001: nonstandard extension 'single line comment' was used
+  Generating Code...
+  ftdebug.c
+..\ftdebug.c(70): warning C4996: 'vsprintf': This function or variable may be unsafe. Consider using vsprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdio.h(1465): note: see declaration of 'vsprintf'
+..\ftdebug.c(87): warning C4996: 'vsprintf': This function or variable may be unsafe. Consider using vsprintf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdio.h(1465): note: see declaration of 'vsprintf'
+..\ftdebug.c(149): warning C4996: 'getenv': This function or variable may be unsafe. Consider using _dupenv_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.10240.0\ucrt\stdlib.h(1183): note: see declaration of 'getenv'
+C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1357,5): warning MSB8012: TargetPath(C:\Users\Daniel\Desktop\FreeType\freetype-2.7\builds\windows\visualc\.\..\..\..\objs\debug\freetype.lib) does not match the Library's OutputFile property value (C:\Users\Daniel\Desktop\FreeType\freetype-2.7\objs\freetype27_D.lib). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppBuild.targets(1359,5): warning MSB8012: TargetName(freetype) does not match the Library's OutputFile property value (freetype27_D). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Lib.OutputFile).
+  freetype.vcxproj -> C:\Users\Daniel\Desktop\FreeType\freetype-2.7\builds\windows\visualc\.\..\..\..\objs\debug\freetype.lib

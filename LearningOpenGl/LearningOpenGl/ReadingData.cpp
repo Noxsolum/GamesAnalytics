@@ -7,7 +7,7 @@
 #include <GLFW\glew.h>
 // GLFW
 #include <GLFW\glfw3.h>
-#include "ReadingData.h"
+#include "ReadingAndAnalyzing.h"
 #include <glm\glm.hpp>
 #include <glm\gtc\matrix_transform.hpp>
 #include <glm\gtc\type_ptr.hpp>
@@ -15,17 +15,18 @@
 #include <glm\gtx\string_cast.hpp>
 
 using namespace std;
+using namespace glm;
 
-void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 newArrayTwo[], glm::vec3 newArrayThree[], glm::vec3 newArrayFour[], glm::vec3 newArrayFive[], glm::vec3 newArraySix[], glm::vec3 newArraySeven[], glm::vec3 newArrayEight[], glm::vec3 newArrayNine[], glm::vec3 newArrayAll[])
+// =========================================
+// --- Reading in the Player Positions ---
+// =========================================
+void ReadingPositions(vec3 newArrayZero[], vec3 newArrayOne[], vec3 newArrayTwo[], vec3 newArrayThree[], glm::vec3 newArrayFour[], glm::vec3 newArrayFive[], glm::vec3 newArraySix[], glm::vec3 newArraySeven[], glm::vec3 newArrayEight[], glm::vec3 newArrayNine[], glm::vec3 newArrayAll[])
 {
+	cout << "Begins Reading Data!" << endl;
+
 	ifstream myLogFile;
 	string line;
-	//myLogFile.open("C:\\Users\\Computing\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading1.txt");
-	myLogFile.open("..\\DataForReading2.txt");
-	//myLogFile.open("C:\\Users\\\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading3.txt");
-	int MaxNum = 0;
-
-	cout << "Begins Reading Data!" << endl;
+	string PosLine;	
 	int a = 0;
 	int b = 0;
 	int c = 0;
@@ -38,6 +39,16 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 	int n = 0;
 	int o = 0;
 	int i = 0;
+	float x, y;	
+	int MaxNum = 0;
+
+	//myLogFile.open("..\\DataForReading1.txt");
+	myLogFile.open("..\\DataForReading2.txt");
+	//myLogFile.open("..\\DataForReading3.txt");
+
+	// ================================================
+	// --- Checks Each Line for individual Players ---
+	// ================================================
 	for (string line; getline(myLogFile, line);)
 	{
 		istringstream in(line);
@@ -51,11 +62,9 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 			{
 				getline(myLogFile, line);
 				istringstream in(line);
-				string PosLine;
 				in >> PosLine;
 				if (PosLine == "CurrentPos")
 				{
-					float x, y;
 					in >> x >> y;
 					newArrayZero[a] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
@@ -67,11 +76,9 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 			{
 				getline(myLogFile, line);
 				istringstream in(line);
-				string PosLine;
 				in >> PosLine;
 				if (PosLine == "CurrentPos")
 				{
-					float x, y;
 					in >> x >> y;
 					newArrayOne[b] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
@@ -83,11 +90,9 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 			{
 				getline(myLogFile, line);
 				istringstream in(line);
-				string PosLine;
 				in >> PosLine;
 				if (PosLine == "CurrentPos")
 				{
-					float x, y;
 					in >> x >> y;
 					newArrayTwo[c] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
@@ -99,11 +104,9 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 			{
 				getline(myLogFile, line);
 				istringstream in(line);
-				string PosLine;
 				in >> PosLine;
 				if (PosLine == "CurrentPos")
 				{
-					float x, y;
 					in >> x >> y;
 					newArrayThree[d] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
@@ -115,11 +118,9 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 			{
 				getline(myLogFile, line);
 				istringstream in(line);
-				string PosLine;
 				in >> PosLine;
 				if (PosLine == "CurrentPos")
 				{
-					float x, y;
 					in >> x >> y;
 					newArrayFour[e] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
@@ -131,11 +132,9 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 			{
 				getline(myLogFile, line);
 				istringstream in(line);
-				string PosLine;
 				in >> PosLine;
 				if (PosLine == "CurrentPos")
 				{
-					float x, y;
 					in >> x >> y;
 					newArrayFive[f] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
@@ -147,11 +146,9 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 			{
 				getline(myLogFile, line);
 				istringstream in(line);
-				string PosLine;
 				in >> PosLine;
 				if (PosLine == "CurrentPos")
 				{
-					float x, y;
 					in >> x >> y;
 					newArraySix[g] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
@@ -163,11 +160,9 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 			{
 				getline(myLogFile, line);
 				istringstream in(line);
-				string PosLine;
 				in >> PosLine;
 				if (PosLine == "CurrentPos")
 				{
-					float x, y;
 					in >> x >> y;
 					newArraySeven[h] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
@@ -179,11 +174,9 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 			{
 				getline(myLogFile, line);
 				istringstream in(line);
-				string PosLine;
 				in >> PosLine;
 				if (PosLine == "CurrentPos")
 				{
-					float x, y;
 					in >> x >> y;
 					newArrayEight[m] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
@@ -195,11 +188,9 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 			{
 				getline(myLogFile, line);
 				istringstream in(line);
-				string PosLine;
 				in >> PosLine;
 				if (PosLine == "CurrentPos")
 				{
-					float x, y;
 					in >> x >> y;
 					newArrayNine[n] = glm::vec3(x, y, 0.0f);
 					newArrayAll[i] = glm::vec3(x, y, 0.0f);
@@ -209,36 +200,42 @@ void ReadingData(glm::vec3 newArrayZero[], glm::vec3 newArrayOne[], glm::vec3 ne
 			}
 		}
 	}
+
 	i = 0;
 	myLogFile.close();
 	cout << "Exits Reading Data!" << endl;
 }
 
-void ReadingDeath(glm::vec3 newArrayDeath[])
+// ==============================================
+// --- Reading in the Player Death Positions ---
+// ==============================================
+void ReadingDeath(vec3 newArrayDeath[])
 {
-	ifstream myLogFile;
-	string line;
-	//myLogFile.open("C:\\Users\\Computing\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading1.txt");
-	myLogFile.open("C:\\Users\\Computing\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading2.txt");
-	//myLogFile.open("C:\\Users\\Computing\\Documents\\GitHub\\GamesAnalytics\\LearningOpenGl\\DataForReading3.txt");
-	int MaxNum = 0;
-
 	cout << "Begins Reading Death Positions!" << endl;
 
+	ifstream myLogFile;
+	string line;
+	int MaxNum = 0;
+	float x, y;
 	int o = 0;
+	string type;
+
+	//myLogFile.open("..\\DataForReading1.txt");
+	myLogFile.open("..\\DataForReading2.txt");
+	//myLogFile.open("..\\DataForReading3.txt");
+	
 	for (string line; getline(myLogFile, line);)
 	{
 		istringstream in(line);
-		string type;
 		in >> type;
 		if (type == "DiedAt")
 		{
-			float x, y;
 			in >> x >> y;
 			newArrayDeath[o] = glm::vec3(x, y, 0.0f);
 			o++;
 		}
 	}
+
 	o = 0;
 	cout << "Ends Reading Death Positions!" << endl;
 }

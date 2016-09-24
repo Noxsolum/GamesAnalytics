@@ -15,15 +15,18 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ReadingData.cpp">
+    <ClCompile Include="Actual thing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Actual thing.cpp">
+    <ClCompile Include="ReadingData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ReadingData.h">
+    <ClInclude Include="ShaderHeader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReadingAndAnalyzing.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

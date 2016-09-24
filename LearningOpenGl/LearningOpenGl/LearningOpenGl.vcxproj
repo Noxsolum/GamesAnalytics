@@ -15,7 +15,8 @@
     <ClCompile Include="ReadingData.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ReadingData.h" />
+    <ClInclude Include="ShaderHeader.h" />
+    <ClInclude Include="ReadingAndAnalyzing.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{C23FCDA3-07E8-4B26-94C7-7812E7D932AD}</ProjectGuid>
@@ -46,12 +47,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\Daniel\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Daniel\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs\GLEW32;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Daniel\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs\Freetype\include\freetype2;C:\Users\Daniel\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Daniel\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs\Freetype\lib;C:\Users\Daniel\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs\GLEW32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>C:\Users\Computing\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\Computing\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs\Bitch;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\Daniel\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs;C:\Users\Daniel\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs\freetype-2.7\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\Daniel\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs\freetype-2.7\objs\vc2010\Win32;C:\Users\Daniel\Documents\GitHub\GamesAnalytics\LearningOpenGl\OpenGLLibs\GLEW32;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -61,7 +62,7 @@
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32s.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;glew32s.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
