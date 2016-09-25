@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <thread>
 
 // GLEW
 #define GLEW_STATIC
@@ -61,6 +62,7 @@ bool keys[1024];
 // ==================
 // --- Deltatime ---
 // ==================
+GLfloat currentFrame = 0.0f;
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
@@ -185,9 +187,9 @@ int main()
 	// ========================
 	// --- Getting Shaders ---
 	// ========================
-	Shader defaultShader("C:\\Users\\Daniel\\Documents\\GitHub\\GamesAnalytics\\Heatmapping\\Shader Files\\VertexShaderDefault.txt", "C:\\Users\\Daniel\\Documents\\GitHub\\GamesAnalytics\\Heatmapping\\Shader Files\\FragmentShaderDefault.txt");
+	Shader defaultShader("..\\Shader Files\\VertexShaderDefault.txt", "..\\Shader Files\\FragmentShaderDefault.txt");
 
-	Shader textShader("C:\\Users\\Daniel\\Documents\\GitHub\\GamesAnalytics\\Heatmapping\\Shader Files\\VertexShaderText.txt", "C:\\Users\\Daniel\\Documents\\GitHub\\GamesAnalytics\\Heatmapping\\Shader Files\\FragmentShaderText.txt");
+	Shader textShader("..\\Shader Files\\VertexShaderText.txt", "..\\Shader Files\\FragmentShaderText.txt");
 
 	mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(WIDTH), 0.0f, static_cast<GLfloat>(HEIGHT));
 	textShader.Use();
@@ -362,7 +364,7 @@ int main()
 		// =================================================
 		// --- Calculate deltatime of the current frame ---
 		// =================================================
-		GLfloat currentFrame = glfwGetTime();
+		currentFrame = glfwGetTime();
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
