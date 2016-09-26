@@ -32,4 +32,10 @@ As this is a portfolio piece, there is still plenty more the creator wishes to d
 - Better user controls such mouse input.
 - Full screen option.
 
+### Screenshots
+![Screenshot](https://github.com/Noxsolum/GamesAnalytics/blob/master/Screenshots/Heat%26Traj.png)
+![Screenshot](https://github.com/Noxsolum/GamesAnalytics/blob/master/Screenshots/Heat1.png)
+![Screenshot](https://github.com/Noxsolum/GamesAnalytics/blob/master/Screenshots/Heat2.png)
+![Screenshot](https://github.com/Noxsolum/GamesAnalytics/blob/master/Screenshots/Traj1.png)
+
 While this is a working piece of software, there are many improvements that will be added over time.
